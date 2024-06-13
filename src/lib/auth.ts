@@ -40,4 +40,5 @@ declare module "lucia" {
 interface DatabaseUserAttributes {
 	spotifyId: number;
 	username: string;
+	name: string;
 }

@@ -7,15 +7,9 @@ import type { APIContext } from "astro";
 
 export async function GET(context: APIContext): Promise<Response> {
 	const code = context.url.searchParams.get("code");
-    console.log(`code: ${code}`)
 	const state = context.url.searchParams.get("state");
-    console.log(`state: ${state}`)
 	const storedState = context.cookies.get("spotify_oauth_state")?.value ?? null;
-    console.log(`storedState: ${storedState}`)
 	if (!code || !state || !storedState || state !== storedState) {
-        console.log(`code: ${code}`)
-        console.log(`state: ${state}`)
-        console.log(`storedState: ${storedState}`)
 		return new Response(null, {
 			status: 400
 		});
@@ -29,9 +23,8 @@ export async function GET(context: APIContext): Promise<Response> {
 			}
 		});
 		const spotifyUser: SpotifyUser = await spotifyUserResponse.json();
-		console.log(`user response: ${await JSON.stringify(spotifyUser, null, 2)}`)
+		console.log(`${JSON.stringify(spotifyUser, null, 2)}`)
 		const existingUser = await db.select().from(User).where(eq(User.spotifyId, spotifyUser.id));
-		// const existingUser = await db.select().from(User);
 
 		if (existingUser.length !== 0) {
 			const session = await lucia.createSession(existingUser[0].id, {});
@@ -41,7 +34,7 @@ export async function GET(context: APIContext): Promise<Response> {
 		}
 
 		const userId = generateId(15);
-		await db.insert(User).values({id: userId, spotifyId: spotifyUser.id, username: spotifyUser.id, name: spotifyUser.display_name});
+		await db.insert(User).values({id: userId, spotifyId: spotifyUser.id, name: spotifyUser.display_name, avatar: spotifyUser.images[0].url});
 		const session = await lucia.createSession(userId, {});
 		const sessionCookie = lucia.createSessionCookie(session.id);
 		context.cookies.set(sessionCookie.name, sessionCookie.value, sessionCookie.attributes);
@@ -60,10 +53,17 @@ export async function GET(context: APIContext): Promise<Response> {
 	}
 }
 
+interface Image {
+	url: string;
+	height?: number;
+	width?: number;
+  }
+
 interface SpotifyUser {
 	id: string;
 	login: string;
 	display_name: string;
+	images: Image[];
 }
 
 interface DatabaseUser {

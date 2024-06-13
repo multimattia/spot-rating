@@ -14,7 +14,6 @@ const User = defineTable({
     url: column.text({ optional: true }),
     name: column.text(),
     email: column.text({ unique: true, optional: true }),
-    username: column.text(),
     avatar: column.text({optional: true}),
     spotifyId: column.text({ unique: true }),
     updatedAt: column.date({default: NOW, nullable: true }),

@@ -1,8 +1,19 @@
 ---
-const user = Astro.locals.user;
-if (!user) {
+import { db, User, eq, sql } from "astro:db";
+import { Image } from "astro:assets";
+const luciaUser = Astro.locals.user;
+if (!luciaUser) {
   return Astro.redirect("/login");
 }
+
+const existingUser = (
+  await db
+    .select()
+    .from(User)
+    .where(sql`${User.id} = ${luciaUser.id}`)
+)[0];
+
+console.log(existingUser);
 ---
 
 <html lang="en">
@@ -13,8 +24,8 @@ if (!user) {
     <title>Lucia example</title>
   </head>
   <body>
-    <h1>Hi, {user.spotifyId}!</h1>
-    <p>Your user ID is {user.id}.</p>
+    <Image src={existingUser.avatar} alt=`` inferSize={true} loading="eager" />
+    <h1>Hi, {existingUser.name}!</h1>
     <form method="post" action="/api/logout">
       <button>Sign out</button>
     </form>

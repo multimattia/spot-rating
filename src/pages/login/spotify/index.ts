@@ -14,9 +14,6 @@ export async function GET(context: APIContext): Promise<Response> {
 		maxAge: 60 * 10,
 		sameSite: "lax"
 	});
-    console.log(url.toString())
-    console.log("state:")
-    console.log(state)
 
 	return context.redirect(url.toString());
 }

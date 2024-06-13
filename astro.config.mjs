@@ -9,6 +9,10 @@ export default defineConfig({
   security: {
     checkOrigin: true
   },
+  image: {
+    domains: ["i.scdn.co"],
+    remotePatterns: [{ protocol: "https" }],
+  },
   vite: {
     optimizeDeps: {
       exclude: ["astro:db"]
