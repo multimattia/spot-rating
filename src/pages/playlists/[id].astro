@@ -1,0 +1,48 @@
+---
+const { id } = Astro.params;
+import { db, User, Session, eq, sql } from "astro:db";
+import { Image } from "astro:assets";
+import type PlaylistReturnObject from "../../types/spotifyTypes";
+import TrackListing from "@components/TrackListing.astro";
+
+const luciaUser = Astro.locals.user;
+if (!luciaUser) {
+  return Astro.redirect("/login");
+}
+
+const existingUser = (
+  await db
+    .select()
+    .from(User)
+    .where(sql`${User.id} = ${luciaUser.id}`)
+)[0];
+
+const session = await db
+  .select()
+  .from(Session)
+  .where(eq(existingUser.id, Session.userId));
+
+const spotifyTrackResponse = await fetch(
+  `https://api.spotify.com/v1/playlists/${id}/tracks?fields=items%28added_by.id%2Cadded_at%2Ctrack%28name%2Cpopularity%2Cduration_ms%2Cartists%28name%2Cid%29%2Calbum%28name%2Cimages%29%29`,
+  {
+    headers: {
+      Authorization: `Bearer ${session[0].accessToken}`,
+    },
+  }
+);
+let spotifyTrackData;
+if (spotifyTrackResponse.ok) {
+  spotifyTrackData = await spotifyTrackResponse.json();
+} else {
+  console.error(
+    "error: ",
+    spotifyTrackResponse.status,
+    spotifyTrackResponse.statusText
+  );
+  spotifyTrackData = [];
+}
+console.log(JSON.stringify(spotifyTrackData, null, 2));
+---
+
+<h1>{id}</h1>
+<TrackListing trackData={spotifyTrackData.items} />

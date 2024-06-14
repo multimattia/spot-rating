@@ -1,0 +1,68 @@
+---
+import type {
+  PlaylistResponse,
+  Playlist,
+  PlaylistTrackObject,
+} from "../types/spotifyTypes";
+import { Image } from "astro:assets";
+
+const { trackData } = Astro.props;
+
+let playlistDataArray: PlaylistTrackObject[];
+
+if ("trackData" in Astro.props && Array.isArray(Astro.props.trackData)) {
+  playlistDataArray = Astro.props.trackData as PlaylistTrackObject[];
+} else {
+  // Handle the case where playlistData is not an array
+  console.error("playlistData is not an array");
+  playlistDataArray = [];
+}
+
+console.log(
+  `playlistdata: ${await JSON.stringify(playlistDataArray, null, 2)}`
+);
+
+function formatDuration(durationMs: number) {
+  const minutes = Math.floor(durationMs / 60000);
+  const seconds = Math.floor((durationMs % 60000) / 1000);
+  return `${minutes}:${seconds.toString().padStart(2, "0")}`;
+}
+---
+
+<div class="main-list">
+  <!-- <p>{JSON.stringify(playlistDataArray, null, 2)}</p> -->
+  {
+    playlistDataArray.map((item, index) => (
+      <div class="playlist">
+        <p>{JSON.stringify(item)}</p>
+        {/* <Image
+          src={item.track.album.images[0].url}
+          alt=""
+          width="100"
+          height="100"
+        /> */}
+        <div class="desc">
+          <h2>{item.track.name}</h2>
+          <h3>by {JSON.stringify(item.track.artists)}</h3>
+          <p>Added by {item.added_by.id}</p>
+          <p>Length: {formatDuration(item.track.duration_ms)}</p>
+        </div>
+        {/* <p>{JSON.stringify(item, null, 2)}</p> */}
+      </div>
+    ))
+  }
+</div>
+
+<style>
+  .main-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+  .playlist {
+    display: flex;
+    align-items: center;
+    background-color: aliceblue;
+    gap: 0.7rem;
+  }
+</style>

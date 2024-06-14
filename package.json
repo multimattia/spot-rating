@@ -18,5 +18,9 @@
     "lucia": "^3.2.0",
     "lucia-adapter-astrodb": "^0.0.9",
     "typescript": "^5.4.5"
+  },
+  "devDependencies": {
+    "prettier": "^3.3.2",
+    "prettier-plugin-astro": "^0.14.0"
   }
 }

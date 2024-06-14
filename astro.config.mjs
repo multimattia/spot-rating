@@ -1,13 +1,13 @@
-import { defineConfig } from 'astro/config';
+import { defineConfig } from "astro/config";
 
 import db from "@astrojs/db";
 
 // https://astro.build/config
 export default defineConfig({
-  output: 'server',
+  output: "server",
   integrations: [db()],
   security: {
-    checkOrigin: true
+    checkOrigin: true,
   },
   image: {
     domains: ["i.scdn.co"],
@@ -15,7 +15,7 @@ export default defineConfig({
   },
   vite: {
     optimizeDeps: {
-      exclude: ["astro:db"]
-    }
-  }
+      exclude: ["astro:db"],
+    },
+  },
 });
