@@ -1,26 +1,17 @@
 ---
-import type {
-  PlaylistResponse,
-  Playlist,
-  PlaylistTrackObject,
-} from "../types/spotifyTypes";
+import type { PlaylistTrackObject } from "../types/spotifyTypes";
 import { Image } from "astro:assets";
 
-const { trackData } = Astro.props;
-
 let playlistDataArray: PlaylistTrackObject[];
+
+const { id } = Astro.props;
 
 if ("trackData" in Astro.props && Array.isArray(Astro.props.trackData)) {
   playlistDataArray = Astro.props.trackData as PlaylistTrackObject[];
 } else {
-  // Handle the case where playlistData is not an array
   console.error("playlistData is not an array");
   playlistDataArray = [];
 }
-
-console.log(
-  `playlistdata: ${await JSON.stringify(playlistDataArray, null, 2)}`
-);
 
 function formatDuration(durationMs: number) {
   const minutes = Math.floor(durationMs / 60000);
@@ -30,27 +21,34 @@ function formatDuration(durationMs: number) {
 ---
 
 <div class="main-list">
-  <!-- <p>{JSON.stringify(playlistDataArray, null, 2)}</p> -->
-  {
-    playlistDataArray.map((item, index) => (
-      <div class="playlist">
-        <p>{JSON.stringify(item)}</p>
-        {/* <Image
-          src={item.track.album.images[0].url}
-          alt=""
-          width="100"
-          height="100"
-        /> */}
-        <div class="desc">
-          <h2>{item.track.name}</h2>
-          <h3>by {JSON.stringify(item.track.artists)}</h3>
-          <p>Added by {item.added_by.id}</p>
-          <p>Length: {formatDuration(item.track.duration_ms)}</p>
+  <button id="fetchButton">Fetch Tracks</button>
+  <playlist-id data-id={id} class="playist-cluster">
+    {
+      playlistDataArray.map((item, index) => (
+        <div class="playlist">
+          {/* <p>{JSON.stringify(item)}</p> */}
+          <p style="min-width: 1.2rem">{index + 1}</p>
+          <Image
+            src={
+              item.track.album.images[0]?.url
+                ? item.track.album.images[0].url
+                : "https://kagi.com/proxy/360_F_248426448_NVKLywWqArG2ADUxDq6QprtIzsF82dMF.jpg?c=l0oPx0FvhjhG2vnK29uE37OLQc-WdefmvQp_UcLKL29LDJEkeYiVhvf2KWXWGustLbBUuFUVTrSjFGd_d3GuBmPOffiZmHemGi6a-Uj_O0D_Dbnq01_FkRla6Ecmv6akMJ1xYVkRKnmiEtwwYeItBw%3D%3D"
+            }
+            alt=""
+            width="100"
+            height="100"
+          />
+          <div class="desc">
+            <h2>{item.track.name}</h2>
+            <h3>by {item.track.artists.map((a) => a.name).join(", ")}</h3>
+            <p>Added by {item.added_by.id ? item.added_by.id : "Spotify"}</p>
+            <p>{formatDuration(item.track.duration_ms)}</p>
+          </div>
         </div>
-        {/* <p>{JSON.stringify(item, null, 2)}</p> */}
-      </div>
-    ))
-  }
+      ))
+    }
+  </playlist-id>
+  <div class="test"></div>
 </div>
 
 <style>
@@ -63,6 +61,200 @@ function formatDuration(durationMs: number) {
     display: flex;
     align-items: center;
     background-color: aliceblue;
-    gap: 0.7rem;
+    gap: 3.7rem;
   }
 </style>
+
+<script>
+  import type { Spotify } from "arctic";
+
+  interface SpotifyTrack {
+    track: {
+      album: {
+        images: {
+          height: number;
+          url: string;
+          width: number;
+        }[];
+        name: string;
+      };
+      artists: {
+        name: string;
+      }[];
+      duration_ms: number;
+      name: string;
+      popularity: number;
+    };
+    added_by: {
+      id: string;
+    };
+    added_at: string;
+  }
+  let offset = 100;
+  let loadingTracks = false;
+  let id: string;
+  let allTracksLoaded = false;
+  console.log(offset);
+
+  // const debounce = (func, wait) => {
+  //   let timeout;
+  //   return () => {
+  //     const context = this;
+  //     const args = arguments;
+  //     clearTimeout(timeout);
+  //     timeout = setTimeout(() => func.apply(context, args), wait);
+  //   }
+  // }
+
+  function debounce<T extends (...args: any[]) => void>(
+    func: T,
+    wait: number
+  ): (...args: Parameters<T>) => void {
+    let timeout: NodeJS.Timeout | undefined;
+    return (...args: Parameters<T>): void => {
+      const later = () => {
+        clearTimeout(timeout);
+        func(...args);
+      };
+      clearTimeout(timeout);
+      timeout = setTimeout(later, wait);
+    };
+  }
+
+  const createPlaylistElement = (
+    fetchedTrack: SpotifyTrack
+  ): HTMLDivElement => {
+    console.log(`appending ${fetchedTrack.track.name}`);
+    const playlistDiv = document.createElement("div");
+    playlistDiv.className = "playlist";
+
+    const indexPara = document.createElement("p");
+    indexPara.style.minWidth = "1.2rem";
+    indexPara.textContent = "1";
+    playlistDiv.appendChild(indexPara);
+
+    const image = document.createElement("img");
+    image.src = fetchedTrack.track.album.images[2]?.url
+      ? fetchedTrack.track.album.images[2].url
+      : "https://kagi.com/proxy/360_F_248426448_NVKLywWqArG2ADUxDq6QprtIzsF82dMF.jpg?c=l0oPx0FvhjhG2vnK29uE37OLQc-WdefmvQp_UcLKL29LDJEkeYiVhvf2KWXWGustLbBUuFUVTrSjFGd_d3GuBmPOffiZmHemGi6a-Uj_O0D_Dbnq01_FkRla6Ecmv6akMJ1xYVkRKnmiEtwwYeItBw%3D%3D";
+    image.alt = "";
+    image.width = 100;
+    image.height = 100;
+    playlistDiv.appendChild(image);
+
+    const descDiv = document.createElement("div");
+    descDiv.className = "desc";
+    playlistDiv.appendChild(descDiv);
+
+    const nameHeading = document.createElement("h2");
+    nameHeading.textContent = fetchedTrack.track.name;
+    descDiv.appendChild(nameHeading);
+
+    const artistsHeading = document.createElement("h3");
+    artistsHeading.textContent = fetchedTrack.track.artists
+      .map((artist) => artist.name)
+      .join(",");
+    descDiv.appendChild(artistsHeading);
+
+    const addedByPara = document.createElement("p");
+    addedByPara.textContent = `added by ${fetchedTrack.added_by.id}`;
+    descDiv.appendChild(addedByPara);
+
+    const durationPara = document.createElement("p");
+    durationPara.textContent = `duration: ${fetchedTrack.track.duration_ms}`;
+    descDiv.appendChild(durationPara);
+
+    return playlistDiv;
+  };
+  const styleElement = document.createElement("style");
+  const cssContent = `
+    .playlist {
+      display: flex;
+      align-items: center;
+      background-color: aliceblue;
+      gap: 3.7rem;
+    }
+  `;
+  document.head.appendChild(styleElement);
+
+  const isNearBottom = (): boolean => {
+    const threshold: number = 100;
+    const position: number = window.scrollY + window.innerHeight;
+    const height: number = document.documentElement.scrollHeight;
+    return position > height - threshold;
+  };
+
+  const handleScroll = () => {
+    let fetchedData: SpotifyTrack[] = [];
+    if (isNearBottom() && offset < 800 && !loadingTracks && !allTracksLoaded) {
+      console.log("Reached End of page.");
+      offset = offset + 100;
+      const playlistElement = document.querySelector(".test");
+      loadingTracks = true;
+      fetch(`/api/playlists/${id}/${offset}/tracks/`)
+        .then((response) => {
+          console.log(response);
+          return response.json();
+        })
+        .then((data) => {
+          // Handle the response data
+          console.log(data);
+          console.log(typeof data);
+          data.items.forEach((song: Spotify[]) =>
+            playlistElement?.appendChild(createPlaylistElement(song))
+          );
+          if (data.items.length < 100) {
+            allTracksLoaded = true;
+          }
+          loadingTracks = false;
+        })
+        .catch((error) => {
+          // Handle any errors
+          console.error("Error:", error);
+          fetchedData = [];
+        });
+
+      // for (let i = 0; i < 10; i++) {
+      //   const newP = document.createElement("p");
+      //   newP.innerText = `newP ${i}`;
+      //   playlistElement?.appendChild(createPlaylistElement(i));
+      // }
+      styleElement.textContent = cssContent;
+    }
+  };
+
+  const debouncedScroll = debounce(handleScroll, 200);
+
+  window.addEventListener("scroll", debouncedScroll);
+
+  class TrackListing extends HTMLElement {
+    constructor() {
+      super();
+
+      // Read the message from the data attribute.
+      id = this.dataset.id ? this.dataset.id : "";
+      const fetchButton = document.getElementById("fetchButton");
+
+      fetchButton?.addEventListener("click", () => {
+        offset = offset + 100;
+        console.log(this.dataset.id);
+        console.log(offset);
+
+        fetch(`/api/playlists/${id}/${offset - 100}/tracks/`)
+          .then((response) => {
+            console.log(response);
+            return response.json();
+          })
+          .then((data) => {
+            // Handle the response data
+            console.log(data);
+          })
+          .catch((error) => {
+            // Handle any errors
+            console.error("Error:", error);
+          });
+      });
+    }
+  }
+  customElements.define("playlist-id", TrackListing);
+</script>

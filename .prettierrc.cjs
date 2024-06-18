@@ -1,0 +1,4 @@
+{
+  astroAllowShorthand: false;
+  astroSkipFrontmatter: false;
+}

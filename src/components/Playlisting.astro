@@ -1,20 +1,15 @@
 ---
-import type { PlaylistResponse, Playlist } from "../types/spotifyTypes.d.ts";
+import type { Playlist } from "../types/spotifyTypes.d.ts";
 import { Image } from "astro:assets";
-
-const { playlistData } = Astro.props;
 
 let playlistDataArray: Playlist[];
 
 if ("playlistData" in Astro.props && Array.isArray(Astro.props.playlistData)) {
   playlistDataArray = Astro.props.playlistData as Playlist[];
 } else {
-  // Handle the case where playlistData is not an array
   console.error("playlistData is not an array");
   playlistDataArray = [];
 }
-
-// console.log(`playlistdata: ${await JSON.stringify(playlistData, null, 2)}`);
 ---
 
 <div class="main-list">
@@ -28,7 +23,7 @@ if ("playlistData" in Astro.props && Array.isArray(Astro.props.playlistData)) {
               <h2>{item.name}</h2>
               <h3>by {item.owner.display_name}</h3>
               <p>{item.description}</p>
-              <p>{JSON.stringify(item, null, 2)}</p>
+              {/* <p>{JSON.stringify(item, null, 2)}</p> */}
             </div>
           </div>
         </a>
