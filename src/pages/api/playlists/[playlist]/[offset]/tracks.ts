@@ -55,20 +55,6 @@ export async function GET(context: APIContext): Promise<Response> {
     spotifyTrackData = [];
   }
 
-  // try {
-  //   const serializedData = JSON.stringify(spotifyTrackData);
-  //   console.log(serializedData);
-  //   const parsedData = JSON.parse(serializedData);
-  // } catch (error) {
-  //   console.error("error serializing: ", error);
-  //   return new Response(JSON.stringify({ error: "internal server error" }), {
-  //     status: 500,
-  //     headers: {
-  //       "Content-Type": "application/json",
-  //     },
-  //   });
-  // }
-
   return new Response(JSON.stringify(spotifyTrackData), {
     status: spotifyTrackResponse.ok ? 200 : spotifyTrackResponse.status,
     headers: {

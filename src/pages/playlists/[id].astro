@@ -45,6 +45,13 @@ if (spotifyTrackResponse.ok) {
 }
 ---
 
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width" />
+  <meta name="generator" content={Astro.generator} />
+  <title>Lucia example</title>
+</head>
+
 <h1>{spotifyTrackData.name}</h1>
 <h3>by {spotifyTrackData.owner.display_name}</h3>
 <h4>{spotifyTrackData.followers.total} followers</h4>
