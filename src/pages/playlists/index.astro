@@ -45,6 +45,13 @@ if (spotifyUserResponse.ok) {
   spotifyUserData = [];
 }
 
+interface plists {
+  id: string;
+  userId: string;
+  ownerId: string;
+  name: string;
+}
+
 // refreshed: {
 //   "accessToken": "BQBfYyJTlJcFbg9bNLUQX1kZ6fvKpYFusSeG6eD25_hzBi9jjgaTSyMGYNM_DP5pfqQSDwOcrnxpR7xgBB2A4YBPeQL8P5JEmJ2owFn3xd9n663cVwfU49IF5cI4rXTl4jOFXa3S7LEGilVWr__OIhiiCXWL_kBPWMxGlaLqF5DhAXImlA",
 //   "accessTokenExpiresAt": "2024-06-14T17:12:24.448Z"
@@ -81,7 +88,7 @@ if (spotifyUserResponse.ok) {
         >Missing playlists? Make sure that they're visible from your profile!</em
       >
     </p>
-    {userPlaylists.map((plist) => <p>{JSON.stringify(plist)}</p>)}
+    {userPlaylists.map((plist: plists) => <p>{JSON.stringify(plist)}</p>)}
   </body>
 
   <script>
