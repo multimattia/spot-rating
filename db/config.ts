@@ -9,6 +9,7 @@ const Session = defineTable({
     accessToken: column.text({ optional: true }),
     tokenExpires: column.date({ optional: true }),
   },
+  indexes: [{ on: ["id", "userId"] }],
 });
 
 const User = defineTable({
@@ -22,60 +23,113 @@ const User = defineTable({
     updatedAt: column.date({ default: NOW, nullable: true }),
     createdAt: column.date({ default: NOW, nullable: true }),
   },
+  indexes: [{ on: ["id", "spotifyId"] }],
 });
 
-const Song = defineTable({
+const Songs = defineTable({
   columns: {
     id: column.text({ primaryKey: true }),
-    uri: column.text(),
     name: column.text(),
-    playlist: column.text({ references: () => Playlist.columns.id }),
-    cover: column.text(),
+    duration_ms: column.number(),
+    addedById: column.text(),
+    playlistId: column.text({ references: () => Playlists.columns.id }),
+    albumId: column.text(),
+    popularity: column.number(),
+    addedAt: column.date(),
+  },
+  indexes: [{ on: ["id"] }],
+});
+
+const Songs_Temp = defineTable({
+  columns: {
+    id: column.text({ primaryKey: true }),
+    name: column.text(),
+    duration_ms: column.number(),
+    addedById: column.text(),
+    playlistId: column.text(),
+    spotifyId: column.text(),
+    albumId: column.text(),
+    popularity: column.number(),
+    addedAt: column.date(),
+  },
+  indexes: [{ on: ["id"] }],
+});
+
+const SongStaging = defineTable({
+  columns: {
+    id: column.text({ primaryKey: true }),
+    playlist_id: column.text(),
+    added_by_id: column.text(),
+    album_id: column.text(),
+    name: column.text(),
+    duration_ms: column.number(),
+    popularity: column.number(),
+    added_at: column.date(),
   },
 });
 
-const Artist = defineTable({
+const Artists = defineTable({
   columns: {
     id: column.text({ primaryKey: true }),
+    name: column.text(),
+  },
+});
+
+const Albums = defineTable({
+  columns: {
+    id: column.text({ primaryKey: true }),
+    name: column.text(),
+  },
+});
+const SongPlaylists = defineTable({
+  columns: {
+    id: column.text(),
+    songId: column.text({ references: () => Songs.columns.id }),
+    playlistId: column.text({ references: () => Playlists.columns.id }),
   },
 });
 
 const SongArtist = defineTable({
   columns: {
-    id: column.text(),
-    songId: column.text({ references: () => Song.columns.id }),
-    artistId: column.text({ references: () => Artist.columns.id }),
+    id: column.text({ primaryKey: true }),
+    songId: column.text({ references: () => Songs.columns.id }),
+    artistId: column.text({ references: () => Artists.columns.id }),
   },
 });
 
-const Playlist = defineTable({
+const SongAlbums = defineTable({
+  columns: {
+    id: column.text(),
+    songId: column.text({ references: () => Songs.columns.id }),
+    albumId: column.text({ references: () => Albums.columns.id }),
+  },
+});
+
+const Playlists = defineTable({
+  columns: {
+    id: column.text({ primaryKey: true, unique: true }),
+    userId: column.text({ references: () => User.columns.id }),
+    ownerId: column.text({ references: () => User.columns.spotifyId }),
+    name: column.text(),
+  },
+});
+
+const PlaylistComments = defineTable({
   columns: {
     id: column.text({ primaryKey: true }),
+    name: column.text(),
+    author: column.text({ references: () => User.columns.id }),
+    playlist: column.text({ references: () => Playlists.columns.id }),
   },
 });
 
-const Addition = defineTable({
+const Comments = defineTable({
   columns: {
     id: column.number({ primaryKey: true }),
-    songId: column.text({ references: () => Song.columns.id }),
-    userId: column.text({ references: () => User.columns.id }),
-  },
-});
-
-const Comment = defineTable({
-  columns: {
-    id: column.number({ primaryKey: true }),
-    songId: column.text({ references: () => Song.columns.id }),
+    songId: column.text({ references: () => Songs.columns.id }),
+    playlistId: column.text({ references: () => Playlists.columns.id }),
     userId: column.text({ references: () => User.columns.id }),
     comment: column.text(),
-  },
-});
-
-const Rating = defineTable({
-  columns: {
-    id: column.number({ primaryKey: true }),
-    songId: column.text({ references: () => Song.columns.id }),
-    userId: column.text({ references: () => User.columns.id }),
     rating: column.number(),
   },
 });
@@ -85,12 +139,16 @@ export default defineDb({
   tables: {
     Session,
     User,
-    Song,
-    Addition,
-    Comment,
-    Rating,
-    Playlist,
+    Songs,
+    Songs_Temp,
+    Albums,
+    Comments,
+    Playlists,
+    PlaylistComments,
     SongArtist,
-    Artist,
+    SongPlaylists,
+    SongAlbums,
+    Artists,
+    SongStaging,
   },
 });

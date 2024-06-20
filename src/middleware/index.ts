@@ -2,6 +2,7 @@ import { lucia } from "../lib/auth";
 import { verifyRequestOrigin } from "lucia";
 import { defineMiddleware } from "astro:middleware";
 import type { User as LuciaUser } from "lucia";
+import { db, User, sql } from "astro:db";
 
 export interface ExtendedUser extends LuciaUser {
   display_name: string;
@@ -9,6 +10,11 @@ export interface ExtendedUser extends LuciaUser {
 }
 
 export const onRequest = defineMiddleware(async (context, next) => {
+  // console.log(context);
+  if (context.url.pathname === "/_image") {
+    return next();
+  }
+
   const sessionId = context.cookies.get(lucia.sessionCookieName)?.value ?? null;
 
   if (!sessionId) {
@@ -23,7 +29,7 @@ export const onRequest = defineMiddleware(async (context, next) => {
     context.cookies.set(
       sessionCookie.name,
       sessionCookie.value,
-      sessionCookie.attributes
+      sessionCookie.attributes,
     );
   }
   if (!session) {
@@ -31,10 +37,26 @@ export const onRequest = defineMiddleware(async (context, next) => {
     context.cookies.set(
       sessionCookie.name,
       sessionCookie.value,
-      sessionCookie.attributes
+      sessionCookie.attributes,
     );
   }
+
+  let existingUser;
+  try {
+    existingUser = (
+      await db
+        .select()
+        .from(User)
+        .where(sql`${User.id} = ${session ? session.userId : ""}`)
+    )[0];
+  } catch (e) {
+    console.error(e);
+  }
+
   context.locals.session = session;
   context.locals.user = user;
+  if (context.locals.user) {
+    context.locals.user.username = existingUser.name;
+  }
   return next();
 });

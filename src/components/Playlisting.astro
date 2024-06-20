@@ -7,7 +7,6 @@ let playlistDataArray: Playlist[];
 if ("playlistData" in Astro.props && Array.isArray(Astro.props.playlistData)) {
   playlistDataArray = Astro.props.playlistData as Playlist[];
 } else {
-  console.error("playlistData is not an array");
   playlistDataArray = [];
 }
 ---

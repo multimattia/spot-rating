@@ -17,5 +17,12 @@ export default async function seed() {
       spotifyId: "test",
       uri: "spotify:user:ksdjfasdf",
     },
+    {
+      id: 3,
+      username: "Spotify",
+      name: "Spotify",
+      spotifyId: "spotify",
+      uri: "spotify:user:spotify",
+    },
   ]);
 }

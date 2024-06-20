@@ -11,7 +11,6 @@ if ("trackData" in Astro.props && Array.isArray(Astro.props.trackData)) {
   playlistDataArray = Astro.props.trackData as PlaylistTrackObject[];
   allTracksFetched = playlistDataArray.length < 100;
 } else {
-  console.error("playlistData is not an array");
   playlistDataArray = [];
 }
 
@@ -23,6 +22,15 @@ function formatDuration(durationMs: number) {
 ---
 
 <div class="main-list">
+  <div id="count-cluster">
+    <p id="song-count">0 songs</p>
+    <form method="get" action=`/api/save/${id}`>
+      <button id="post-playlist-button" class="disabled"
+        >Publish playlist for comments</button
+      >
+    </form>
+    <p id="fetch-indicator">Loading playlist...</p>
+  </div>
   <playlist-id
     data-id={id}
     data-all-fetched={allTracksFetched ? "yes" : "no"}
@@ -65,7 +73,6 @@ function formatDuration(durationMs: number) {
       ))
     }
   </playlist-id>
-  <p id="loading-indicator">Loading...</p>
   <div class="test"></div>
 </div>
 
@@ -74,10 +81,26 @@ function formatDuration(durationMs: number) {
     font-family: Helvetica, sans-serif;
   }
 
+  .disabled {
+    opacity: 0.5;
+    pointer-events: none;
+    cursor: not-allowed;
+  }
+
+  #count-cluster {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+
   .main-list {
     display: flex;
     flex-direction: column;
     gap: 1rem;
+  }
+
+  .loading-fade {
+    color: gray;
   }
 
   #track-header {
@@ -117,7 +140,7 @@ function formatDuration(durationMs: number) {
     text-overflow: ellipsis;
     width: 100%;
     display: grid;
-    grid-template-columns: 3fr repeat(3, 1fr);
+    grid-template-columns: 3fr 2fr 2fr 1fr;
     grid-template-rows: 1fr;
     gap: 1rem;
   }
@@ -141,13 +164,6 @@ function formatDuration(durationMs: number) {
   .playlist:hover {
     background-color: #ebebeb;
     transition: all 0.2s ease-out;
-  }
-
-  #loading-indicator {
-    margin: 0 auto;
-    background-color: gray;
-    padding: 10rem 10rem;
-    display: none;
   }
 </style>
 
@@ -175,9 +191,7 @@ function formatDuration(durationMs: number) {
     added_at: string;
   }
   let offset = 100;
-  let loadingTracks = false;
   let id: string;
-  let allTracksLoaded = false;
 
   function debounce<T extends (...args: any[]) => void>(
     func: T,
@@ -215,7 +229,7 @@ function formatDuration(durationMs: number) {
     descDiv.appendChild(cluster);
 
     const image = document.createElement("img");
-    image.src = fetchedTrack.track.album.images[2]?.url
+    image.src = fetchedTrack.track.album?.images[2]?.url
       ? fetchedTrack.track.album.images[2].url
       : "https://kagi.com/proxy/360_F_248426448_NVKLywWqArG2ADUxDq6QprtIzsF82dMF.jpg?c=l0oPx0FvhjhG2vnK29uE37OLQc-WdefmvQp_UcLKL29LDJEkeYiVhvf2KWXWGustLbBUuFUVTrSjFGd_d3GuBmPOffiZmHemGi6a-Uj_O0D_Dbnq01_FkRla6Ecmv6akMJ1xYVkRKnmiEtwwYeItBw%3D%3D";
     image.alt = "";
@@ -230,7 +244,7 @@ function formatDuration(durationMs: number) {
     const artistsHeading = document.createElement("p");
     artistsHeading.textContent = fetchedTrack.track.artists
       .map((artist) => artist.name)
-      .join(",");
+      .join(", ");
     descDiv.appendChild(artistsHeading);
 
     const addedByPara = document.createElement("p");
@@ -251,42 +265,71 @@ function formatDuration(durationMs: number) {
     return position > height - threshold;
   };
 
-  const handleScroll = () => {
-    let fetchedData: SpotifyTrack[] = [];
-    if (isNearBottom() && offset < 800 && !loadingTracks && !allTracksLoaded) {
-      console.log("Reached End of page.");
+  let globalOffset = 0;
+  let loadingTracks = false;
+  let allTracksLoaded = false;
+  let songCount = 0;
+  const songCountElement = document.getElementById("song-count")!;
+  const songLoadElement = document.getElementById("fetch-indicator")!;
+  const playlistElement = document.querySelector("playlist-id")!;
+  const postButtonElement = document.getElementById("post-playlist-button")!;
+  const fetchTracks = (
+    currentOffset = 0,
+    isLoading = false,
+    allLoaded = false
+  ) => {
+    if (!loadingTracks && !allLoaded) {
       console.log("showing loading...");
-      document.getElementById("loading-indicator").style.display = "block";
-      const playlistElement = document.querySelector("playlist-id");
+      if (songLoadElement) {
+        songLoadElement.style.display = "block";
+        songLoadElement.classList.add("loading-fade");
+      }
       loadingTracks = true;
-      fetch(`/api/playlists/${id}/${offset}/tracks/`)
+      fetch(`/api/playlists/${id}/${globalOffset}/tracks/`)
         .then((response) => {
           console.log(response);
           return response.json();
         })
         .then((data) => {
           // Handle the response data
-          console.log(data);
-          console.log("hiding load");
-          document.getElementById("loading-indicator").style.display = "none";
-          data.items.forEach((song: SpotifyTrack) =>
-            playlistElement?.appendChild(createPlaylistElement(song))
-          );
-          offset = offset + 100;
-          if (data.items.length < 100) {
-            allTracksLoaded = true;
-          }
+          data.items.forEach((song: SpotifyTrack) => {
+            if (song.track !== null) {
+              playlistElement?.appendChild(createPlaylistElement(song));
+            }
+          });
+          globalOffset = globalOffset + 100;
+          const newOffset = globalOffset;
           loadingTracks = false;
+          if (songCountElement) {
+            songCount = songCount + data.items.length;
+            songCountElement.innerText = `${songCount} songs`;
+          }
+          fetchTracks(newOffset, false, data.items.length < 100);
         })
         .catch((error) => {
           // Handle any errors
           console.error("Error:", error);
-          fetchedData = [];
+          // fetchedData = [];
         });
 
       styleElement.textContent = cssContent;
+    } else {
+      if (songLoadElement) {
+        songLoadElement.innerText = "Loaded!";
+        if (postButtonElement) {
+          postButtonElement.classList.remove("disabled");
+        }
+        setTimeout(() => {
+          songLoadElement.classList.remove("loading-fade");
+          songLoadElement.style.display = "none";
+        }, 1000);
+      }
     }
   };
+
+  document.addEventListener("DOMContentLoaded", (e) => {
+    fetchTracks(0, false, allTracksLoaded);
+  });
 
   const styleElement = document.createElement("style");
   const cssContent = `
@@ -298,54 +341,44 @@ function formatDuration(durationMs: number) {
     flex-direction: column;
     gap: 1rem;
   }
-
   .header #track-name {
     margin-left: 1rem;
   }
-
   .track-cluster {
     display: flex;
     gap: 1rem;
   }
-
   .playlist {
     height: 5rem;
   }
-
   .playlist img {
     margin-left: 1rem;
   }
-
   .desc {
     text-overflow: ellipsis;
     width: 100%;
     display: grid;
-    grid-template-columns: 3fr repeat(3, 1fr);
+    grid-template-columns: 3fr 2fr 2fr 1fr;
     grid-template-rows: 1fr;
     gap: 1rem;
   }
-
   .desc p {
     text-overflow: ellipsis;
     text-align: start;
   }
-
   .playlist {
     display: flex;
     align-items: center;
     gap: 3.7rem;
     border-top: 1px solid #ececec;
   }
-
   .playlist:nth-of-type(even) {
     background-color: #fafafb;
   }
-
   .playlist:hover {
     background-color: #ebebeb;
     transition: all 0.2s ease-out;
   }
-
   #loading-indicator {
     margin: 0 auto;
     background-color: gray;
@@ -354,8 +387,8 @@ function formatDuration(durationMs: number) {
   }
   `;
 
-  const debouncedScroll = debounce(handleScroll, 200);
-  window.addEventListener("scroll", debouncedScroll);
+  // const debouncedScroll = debounce(handleScroll, 200);
+  // window.addEventListener("scroll", debouncedScroll);
 
   class TrackListing extends HTMLElement {
     constructor() {
@@ -366,6 +399,7 @@ function formatDuration(durationMs: number) {
       // Read the message from the data attribute.
       id = this.dataset.id ? this.dataset.id : "";
       allTracksLoaded = this.dataset.allFetched === "yes" ? true : false;
+      console.log(`alltracks: ${allTracksLoaded}`);
     }
   }
   customElements.define("playlist-id", TrackListing);
