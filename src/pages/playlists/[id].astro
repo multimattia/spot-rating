@@ -2,7 +2,7 @@
 const { id } = Astro.params;
 import { db, User, Session, Playlists, eq, sql } from "astro:db";
 import { Image } from "astro:assets";
-import type PlaylistReturnObject from "../../types/spotifyTypes";
+import type PlaylistReturnObject from "../../types/spotifyTypes.ts";
 import TrackListing from "@components/TrackListing.astro";
 import { spotify } from "src/lib/auth";
 import { GET } from "../api/playlists/[playlist]/[offset]/tracks.ts";
