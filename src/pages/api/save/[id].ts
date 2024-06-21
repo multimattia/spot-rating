@@ -1,18 +1,6 @@
-import { lucia, spotify } from "../../../lib/auth";
-
 import type { APIContext } from "astro";
 
-import {
-  db,
-  Session,
-  Songs,
-  Songs_Temp,
-  User,
-  eq,
-  sql,
-  Playlists,
-} from "astro:db";
-import { insertSongWithRelations } from "src/lib/db-lib";
+import { db, Songs_Temp, User, sql } from "astro:db";
 
 export async function GET(context: APIContext): Promise<Response> {
   if (!context.locals.session) {

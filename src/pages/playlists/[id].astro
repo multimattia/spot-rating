@@ -6,6 +6,7 @@ import type PlaylistReturnObject from "../../types/spotifyTypes.ts";
 import TrackListing from "@components/TrackListing.astro";
 import { spotify } from "src/lib/auth";
 import { GET } from "../api/playlists/[playlist]/[offset]/tracks.ts";
+import BaseLayout from "@layouts/BaseLayout.astro";
 // import { insertSongWithRelations } from "../../lib/db-lib";
 
 const luciaUser = Astro.locals.user;
@@ -62,23 +63,26 @@ if (spotifyTrackResponse.ok) {
 }
 ---
 
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width" />
-  <meta name="generator" content={Astro.generator} />
-  <title>Lucia example</title>
-</head>
-
-<div class="playlist-header">
-  <Image src={spotifyTrackData.images[0].url} alt="" width="200" height="200" />
-  <div class="playlist-info">
-    <h1>{spotifyTrackData.name}</h1>
-    <h3>by {spotifyTrackData.owner.display_name}</h3>
-    <h4>{spotifyTrackData.followers.total} followers</h4>
+<BaseLayout
+  title={`Playlist: ${spotifyTrackData.name}`}
+  existingUser={existingUser}
+>
+  <div class="playlist-header">
+    <Image
+      src={spotifyTrackData.images[0].url}
+      alt=""
+      width="200"
+      height="200"
+    />
+    <div class="playlist-info">
+      <h1>{spotifyTrackData.name}</h1>
+      <h3>by {spotifyTrackData.owner.display_name}</h3>
+      <h4>{spotifyTrackData.followers.total} followers</h4>
+    </div>
   </div>
-</div>
-<!-- <TrackListing trackData={spotifyTrackData.tracks.items} id={id} /> -->
-<TrackListing id={id} />
+  <!-- <TrackListing trackData={spotifyTrackData.tracks.items} id={id} /> -->
+  <TrackListing id={id} />
+</BaseLayout>
 
 <style>
   .playlist-header {

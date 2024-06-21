@@ -1,7 +1,7 @@
 ---
 import { db, User, Session, eq, sql } from "astro:db";
-import { Image } from "astro:assets";
 import Playlisting from "@components/Playlisting.astro";
+import BaseLayout from "@layouts/BaseLayout.astro";
 const luciaUser = Astro.locals.user;
 console.log(luciaUser);
 if (!luciaUser) {
@@ -46,79 +46,6 @@ if (spotifyUserResponse.ok) {
 // }
 ---
 
-<html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width" />
-    <meta name="generator" content={Astro.generator} />
-    <title>Create Playlist</title>
-  </head>
-  <body>
-    <nav>
-      <h2 class="title">Spot-rating</h2>
-      <div class="user">
-        <Image
-          src={existingUser.avatar}
-          alt=``
-          height="40"
-          width="40"
-          loading="eager"
-          class="square"
-        />
-        <p>{existingUser.name}</p>
-        <form method="post" action="/api/logout">
-          <button>Sign out</button>
-        </form>
-      </div>
-    </nav>
-    <p>
-      <em
-        >Missing playlists? Make sure that they're visible from your profile!</em
-      >
-    </p>
-    <Playlisting playlistData={spotifyUserData.items} />
-  </body>
-
-  <script>
-    document.forms[0].addEventListener("submit", async (e) => {
-      e.preventDefault();
-      const formElement = e.target as HTMLFormElement;
-      await fetch(formElement.action, {
-        method: formElement.method,
-        body: new FormData(formElement),
-      });
-      window.location.href = "/login";
-    });
-  </script>
-</html>
-
-<style>
-  * {
-    box-sizing: border-box;
-    font-family: Helvetica, Arial, sans-serif;
-  }
-
-  .square {
-    object-fit: cover;
-  }
-
-  .title {
-    flex-grow: 1;
-  }
-
-  .user {
-    display: flex;
-    justify-content: space-around;
-    align-items: center;
-    gap: 1rem;
-  }
-
-  nav {
-    min-width: 100%;
-    padding: 0 2rem 0 2rem;
-    display: flex;
-    background-color: rgb(238, 238, 238);
-    justify-content: space-around;
-    align-items: center;
-  }
-</style>
+<BaseLayout title="Create a playlist" existingUser={existingUser}>
+  <Playlisting playlistData={spotifyUserData.items} />
+</BaseLayout>

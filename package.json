@@ -17,6 +17,8 @@
     "@types/uuid": "^9.0.8",
     "arctic": "^1.9.1",
     "astro": "^4.10.2",
+    "autoprefixer": "^10.4.19",
+    "cssnano": "^7.0.3",
     "lucia": "^3.2.0",
     "lucia-adapter-astrodb": "^0.0.9",
     "typescript": "^5.4.5",
@@ -24,6 +26,7 @@
   },
   "devDependencies": {
     "prettier": "^3.3.2",
-    "prettier-plugin-astro": "^0.14.0"
+    "prettier-plugin-astro": "^0.14.0",
+    "sass": "^1.77.6"
   }
 }

@@ -1,0 +1,52 @@
+---
+const { isSignedIn, existingUser } = Astro.props;
+import { Image } from "astro:assets";
+---
+
+<nav>
+  <h2 class="title">Spot-rating</h2>
+  <div class="user">
+    {isSignedIn ?
+    <Image
+      src={existingUser.avatar}
+      alt=``
+      height="40"
+      width="40"
+      loading="eager"
+      class="square"
+    />
+    <p>{existingUser.name}</p>
+    <form method="post" action="/api/logout">
+      <button>Sign out</button>
+    </form>
+    : <p>Welcome!</p>
+      <a href="/login/spotify">Sign in with Spotify</a>
+    }
+  </div>
+</nav>
+
+<style lang="scss">
+  .square {
+    object-fit: cover;
+  }
+
+  .title {
+    flex-grow: 1;
+  }
+
+  .user {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  nav {
+    min-width: 100%;
+    padding: 0 2rem 0 2rem;
+    display: flex;
+    background-color: rgb(238, 238, 238);
+    justify-content: space-around;
+    align-items: center;
+  }
+</style>
