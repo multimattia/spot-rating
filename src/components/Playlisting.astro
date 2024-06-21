@@ -21,9 +21,8 @@ import "@styles/components/PlaylistEntry.scss";
             <Image src={item.images[0].url} alt="" width="100" height="100" />
             <div class="desc">
               <h2 class="nowrap ellipsify">{item.name}</h2>
-              <h3>by {item.owner.display_name}</h3>
+              <h4 class="nowrap ellipsify">by {item.owner.display_name}</h4>
               <p class="nowrap ellipsify">{item.description}</p>
-              {/* <p>{JSON.stringify(item, null, 2)}</p> */}
             </div>
           </div>
         </a>
@@ -58,11 +57,11 @@ import "@styles/components/PlaylistEntry.scss";
   }
 
   .playlist {
-    background-color: var(--grass-4);
+    background-color: var(--amber-1);
   }
 
   .playlist:hover {
-    background-color: var(--grass-3);
+    background-color: var(--amber-2);
   }
 
   .playlist::after {

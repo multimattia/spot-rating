@@ -1,7 +1,6 @@
 ---
 import { db, User, Session, Playlists, eq, sql } from "astro:db";
 import BaseLayout from "@layouts/BaseLayout.astro";
-import LocalPlaylist from "@components/LocalPlaylist.astro";
 import Playlisting from "@components/Playlisting.astro";
 const luciaUser = Astro.locals.user;
 if (!luciaUser) {
@@ -19,11 +18,6 @@ const session = await db
   .select()
   .from(Session)
   .where(eq(existingUser.id, Session.userId));
-
-const userPlaylists = await db
-  .select()
-  .from(Playlists)
-  .where(eq(existingUser.id, Playlists.userId));
 
 let spotifyUserData;
 const spotifyUserResponse = await fetch(
@@ -53,15 +47,20 @@ if (spotifyUserResponse.ok) {
 
 <BaseLayout title="Your Playlists" existingUser={existingUser}>
   <h1>{existingUser.name}'s Public Spotify Playlists</h1>
+  <h4>
+    Don't see what you're looking for? Make sure the playlist is visible from
+    your profile!
+  </h4>
   <Playlisting playlistData={spotifyUserData.items} />
-  <!-- {
-    userPlaylists.map((plist: plists) => (
-      <LocalPlaylist playlistObject={plist} />
-    ))
-  } -->
 </BaseLayout>
 <style lang="scss">
   h1 {
-    margin: var(--space-xl) 0;
+    margin: var(--space-xl) 0 var(--space-2xs) 0;
+  }
+
+  h4 {
+    color: var(--gray-11);
+    font-size: var(--step-0);
+    margin-bottom: var(--space-m);
   }
 </style>

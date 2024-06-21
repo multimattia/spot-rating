@@ -2,12 +2,8 @@
 const { id } = Astro.params;
 import { db, User, Session, Playlists, Songs_Temp, eq, sql } from "astro:db";
 import { Image } from "astro:assets";
-import type PlaylistReturnObject from "../../types/spotifyTypes.ts";
 import LocalSong from "@components/LocalSong.astro";
-import { spotify } from "src/lib/auth";
-import { GET } from "../api/playlists/[playlist]/[offset]/tracks.ts";
 import BaseLayout from "@layouts/BaseLayout.astro";
-// import { insertSongWithRelations } from "../../lib/db-lib";
 
 const luciaUser = Astro.locals.user;
 if (!luciaUser) {
@@ -21,15 +17,13 @@ const existingUser = (
     .where(sql`${User.id} = ${luciaUser.id}`)
 )[0];
 
-console.log(existingUser);
-
 const session = await db
   .select()
   .from(Session)
   .where(eq(existingUser.id, Session.userId));
 
 const playlistInfo = await fetch(
-  `https://api.spotify.com/v1/playlists/${id}?fields=owner%28display_name%29%2C+images%28url%29`,
+  `https://api.spotify.com/v1/playlists/${id}?fields=name%2C,description%2Cowner%28display_name%29%2C+images%28url%29`,
   {
     headers: {
       Authorization: `Bearer ${session[0].accessToken}`,
@@ -45,16 +39,21 @@ const savedSongs = await db
   .from(Songs_Temp)
   .where(sql`${id} = ${Songs_Temp.playlistId}`);
 
+console.log(JSON.stringify(playlistData, null, 2));
 ---
 
 <BaseLayout title={`Playlist: ${"asd"}`} existingUser={existingUser}>
   <div class="playlist-header">
     <Image src={playlistData.images[0].url} alt="" width="200" height="200" />
-    <div class="playlist-info"></div>
+    <div class="playlist-info">
+      <h2>
+        {playlistData.name}
+      </h2>
+      <h5>By {playlistData.owner.display_name}</h5>
+      <h5>{playlistData.description}</h5>
+    </div>
   </div>
-  <!-- {savedSongs.slice(0, 2).map((item) => <>{JSON.stringify(item, null, 2)}</>)} -->
   {savedSongs.map((item) => <LocalSong songInfo={item} />)}
-  <!-- <TrackListing id={id} /> -->
 </BaseLayout>
 
 <style>
@@ -70,5 +69,8 @@ const savedSongs = await db
       rgba(0, 0, 0, 0.17) 0%,
       rgba(255, 255, 255, 1) 58%
     );
+  }
+  h2 {
+    margin: var(--space-m) 0;
   }
 </style>

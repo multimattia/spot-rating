@@ -16,7 +16,7 @@ const { playlistObject } = Astro.props;
   data-content={playlistObject.id}
 >
   <div id={playlistObject.id} class="playlist" data-content="Open">
-    <h2>{playlistObject.name}</h2>
+    <h3 class="nowrap ellipsify">{playlistObject.name}</h3>
     <h4>By {playlistObject.ownerId}</h4>
     <p>
       {playlistObject.songCount}
@@ -27,11 +27,12 @@ const { playlistObject } = Astro.props;
 
 <style lang="scss">
   .playlist {
-    background-color: var(--grass-4);
+    background-color: var(--grass-1);
+    min-height: 20px;
   }
 
   .playlist:hover {
-    background-color: var(--grass-3);
+    background-color: var(--grass-2);
   }
 
   .playlist::after {
