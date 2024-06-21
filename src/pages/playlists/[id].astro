@@ -41,7 +41,6 @@ const spotifyTrackResponse = await fetch(
 let spotifyTrackData;
 if (spotifyTrackResponse.ok) {
   spotifyTrackData = await spotifyTrackResponse.json();
-  console.log(spotifyTrackData);
   try {
     await db.insert(Playlists).values({
       id: spotifyTrackData.id,
@@ -52,7 +51,6 @@ if (spotifyTrackResponse.ok) {
   } catch (e) {
     console.error(`id playlist endpoint error: ${e}`);
   }
-  console.log(await db.select().from(Playlists));
 } else {
   console.error(
     "error: ",

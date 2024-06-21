@@ -1,12 +1,11 @@
 ---
 import BaseLayout from "@layouts/BaseLayout.astro";
-import { db, User, Session, eq, sql } from "astro:db";
-import Playlisting from "@components/Playlisting.astro";
+import { db, User, Playlists, Songs_Temp, eq, sql, desc } from "astro:db";
+import LocalPlaylist from "@components/LocalPlaylist.astro";
 const luciaUser = Astro.locals.user;
 if (!luciaUser) {
   return Astro.redirect("/login");
 }
-let spotifyUserData;
 
 const existingUser = (
   await db
@@ -15,36 +14,44 @@ const existingUser = (
     .where(sql`${User.id} = ${luciaUser.id}`)
 )[0];
 
-const session = await db
-  .select()
-  .from(Session)
-  .where(eq(existingUser.id, Session.userId));
-
-const spotifyUserResponse = await fetch(
-  `https://api.spotify.com/v1/users/${existingUser.spotifyId}/playlists?offset=0&limit=100`,
-  {
-    headers: {
-      Authorization: `Bearer ${session[0].accessToken}`,
-    },
-  }
-);
-if (spotifyUserResponse.ok) {
-  spotifyUserData = await spotifyUserResponse.json();
-} else {
-  console.error(
-    "error: ",
-    spotifyUserResponse.status,
-    spotifyUserResponse.statusText
-  );
-  spotifyUserData = [];
-}
+const playlistsWithLength = await db
+  .select({
+    id: Playlists.id,
+    name: Playlists.name,
+    ownerId: User.name,
+    songCount: sql<number>`COUNT(${Songs_Temp.id})`.as("songCount"),
+  })
+  .from(Playlists)
+  .leftJoin(Songs_Temp, eq(Playlists.id, Songs_Temp.playlistId))
+  .leftJoin(User, eq(Playlists.ownerId, User.spotifyId))
+  .where(eq(Playlists.userId, existingUser.id))
+  .groupBy(Playlists.id, User.name)
+  .orderBy(desc(Playlists.createdAt))
+  .execute();
 
 // refreshed: {
 //   "accessToken": "BQBfYyJTlJcFbg9bNLUQX1kZ6fvKpYFusSeG6eD25_hzBi9jjgaTSyMGYNM_DP5pfqQSDwOcrnxpR7xgBB2A4YBPeQL8P5JEmJ2owFn3xd9n663cVwfU49IF5cI4rXTl4jOFXa3S7LEGilVWr__OIhiiCXWL_kBPWMxGlaLqF5DhAXImlA",
 //   "accessTokenExpiresAt": "2024-06-14T17:12:24.448Z"
 // }
+interface plists {
+  id: string;
+  userId: string;
+  ownerId: string;
+  name: string;
+}
 ---
 
 <BaseLayout isSignedIn={true} title=`Spot-rating` existingUser={existingUser}>
-  <Playlisting playlistData={spotifyUserData.items} />
+  <h1>{existingUser.name}'s Published Mixtapes</h1>
+  {
+    playlistsWithLength.map((plist: plists) => (
+      <LocalPlaylist playlistObject={plist} />
+    ))
+  }
 </BaseLayout>
+
+<style lang="scss">
+  h1 {
+    margin: var(--space-xl) 0;
+  }
+</style>

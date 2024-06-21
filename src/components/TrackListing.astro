@@ -29,7 +29,7 @@ function formatDuration(durationMs: number) {
         >Add playlist to profile</button
       >
     </form>
-    <p id="fetch-indicator">Loading playlist...</p>
+    <p id="fetch-indicator">Fetching playlist entries from Spotify...</p>
   </div>
   <playlist-id
     data-id={id}
@@ -77,10 +77,6 @@ function formatDuration(durationMs: number) {
 </div>
 
 <style>
-  * {
-    font-family: Helvetica, sans-serif;
-  }
-
   .disabled {
     opacity: 0.5;
     pointer-events: none;
@@ -315,7 +311,7 @@ function formatDuration(durationMs: number) {
       styleElement.textContent = cssContent;
     } else {
       if (songLoadElement) {
-        songLoadElement.innerText = "Loaded!";
+        songLoadElement.innerText = "All done!";
         if (postButtonElement) {
           postButtonElement.classList.remove("disabled");
         }
@@ -333,9 +329,6 @@ function formatDuration(durationMs: number) {
 
   const styleElement = document.createElement("style");
   const cssContent = `
-  * {
-    font-family: Helvetica, sans-serif;
-  }
   .main-list {
     display: flex;
     flex-direction: column;

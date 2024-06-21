@@ -46,13 +46,27 @@ const Songs_Temp = defineTable({
     name: column.text(),
     duration_ms: column.number(),
     addedById: column.text(),
-    playlistId: column.text(),
+    playlistId: column.text({ references: () => Playlists.columns.id }),
     spotifyId: column.text(),
     albumId: column.text(),
     popularity: column.number(),
     addedAt: column.date(),
   },
-  indexes: [{ on: ["id"] }],
+  indexes: [
+    { on: ["id"] },
+    {
+      on: ["playlistId"],
+      unique: false,
+    },
+    {
+      on: ["spotifyId"],
+      unique: false,
+    },
+    {
+      on: ["addedById"],
+      unique: false,
+    },
+  ],
 });
 
 const SongStaging = defineTable({
@@ -110,8 +124,20 @@ const Playlists = defineTable({
     id: column.text({ primaryKey: true, unique: true }),
     userId: column.text({ references: () => User.columns.id }),
     ownerId: column.text({ references: () => User.columns.spotifyId }),
+    createdAt: column.date({ default: NOW, nullable: true }),
     name: column.text(),
   },
+  indexes: [
+    { on: ["id"] },
+    {
+      on: ["ownerId"],
+      unique: false,
+    },
+    {
+      on: ["userId"],
+      unique: false,
+    },
+  ],
 });
 
 const PlaylistComments = defineTable({

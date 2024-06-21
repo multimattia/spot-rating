@@ -3,49 +3,101 @@ const { isSignedIn, existingUser } = Astro.props;
 import { Image } from "astro:assets";
 ---
 
-<nav>
-  <h2 class="title">Spot-rating</h2>
-  <div class="user">
-    {isSignedIn ?
-    <Image
-      src={existingUser.avatar}
-      alt=``
-      height="40"
-      width="40"
-      loading="eager"
-      class="square"
-    />
-    <p>{existingUser.name}</p>
-    <form method="post" action="/api/logout">
-      <button>Sign out</button>
-    </form>
-    : <p>Welcome!</p>
-      <a href="/login/spotify">Sign in with Spotify</a>
+<section>
+  <nav>
+    <a class="title" href="/">
+      <h2>Boomboxd</h2>
+    </a>
+    {
+      isSignedIn ? (
+        <span class="nav-cluster">
+          <a id="create" href="/playlists">
+            <p>Load from Spotify</p>
+          </a>
+          <div class="user-cluster">
+            <Image
+              src={existingUser.avatar}
+              alt=""
+              height="40"
+              width="40"
+              loading="eager"
+              class="square"
+            />
+            <p>{existingUser.name}</p>
+            <form method="post" action="/api/logout">
+              <button>Sign out</button>
+            </form>
+          </div>
+        </span>
+      ) : (
+        <span class="user-cluster">
+          <p>Welcome!</p>
+          <a href="/login/spotify">Sign in with Spotify</a>
+        </span>
+      )
     }
-  </div>
-</nav>
+  </nav>
+</section>
 
 <style lang="scss">
   .square {
-    object-fit: cover;
+    object-fit: contain;
+  }
+
+  button {
+    font-size: var(--step-0);
+  }
+
+  #create {
+    border-radius: var(--radius-xs);
+    padding: var(--space-2xs);
+    color: var(--grass-1);
+    background-color: var(--grass-9);
+    font-size: var(--step-0);
+    text-decoration: none;
+  }
+
+  #create:hover {
+    background-color: var(--grass-10);
   }
 
   .title {
     flex-grow: 1;
+    text-decoration: none;
+    color: var(--grass-12);
   }
 
-  .user {
+  .title h2 {
+    font-size: var(--step-2);
+  }
+
+  .title:hover {
+    color: var(--grass-11);
+  }
+
+  .nav-cluster {
+    display: flex;
+    align-items: center;
+    gap: var(--space-xl);
+  }
+
+  .user-cluster {
     display: flex;
     justify-content: space-around;
     align-items: center;
-    gap: 1rem;
+    gap: var(--space-xs);
+  }
+
+  section {
+    width: var(--window-width);
+    margin: 0 auto;
   }
 
   nav {
-    min-width: 100%;
-    padding: 0 2rem 0 2rem;
+    width: 100%;
+    padding: var(--space-m);
     display: flex;
-    background-color: rgb(238, 238, 238);
+    // background-color: var(--grass-2);
     justify-content: space-around;
     align-items: center;
   }

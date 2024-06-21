@@ -54,7 +54,8 @@ export async function GET(context: APIContext): Promise<Response> {
   //     spotifyTrackData = [];
   //   }
 
-  return new Response(JSON.stringify(dbsongs), {
+  return context.redirect(`/`);
+  new Response(JSON.stringify(dbsongs), {
     status: 200,
     headers: {
       "Content-Type": "application/json",

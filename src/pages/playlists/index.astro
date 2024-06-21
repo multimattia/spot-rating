@@ -1,6 +1,8 @@
 ---
 import { db, User, Session, Playlists, eq, sql } from "astro:db";
 import BaseLayout from "@layouts/BaseLayout.astro";
+import LocalPlaylist from "@components/LocalPlaylist.astro";
+import Playlisting from "@components/Playlisting.astro";
 const luciaUser = Astro.locals.user;
 if (!luciaUser) {
   return Astro.redirect("/login");
@@ -23,6 +25,7 @@ const userPlaylists = await db
   .from(Playlists)
   .where(eq(existingUser.id, Playlists.userId));
 
+let spotifyUserData;
 const spotifyUserResponse = await fetch(
   `https://api.spotify.com/v1/users/${existingUser.spotifyId}/playlists?offset=0&limit=100`,
   {
@@ -31,7 +34,6 @@ const spotifyUserResponse = await fetch(
     },
   }
 );
-let spotifyUserData;
 if (spotifyUserResponse.ok) {
   spotifyUserData = await spotifyUserResponse.json();
 } else {
@@ -43,13 +45,6 @@ if (spotifyUserResponse.ok) {
   spotifyUserData = [];
 }
 
-interface plists {
-  id: string;
-  userId: string;
-  ownerId: string;
-  name: string;
-}
-
 // refreshed: {
 //   "accessToken": "BQBfYyJTlJcFbg9bNLUQX1kZ6fvKpYFusSeG6eD25_hzBi9jjgaTSyMGYNM_DP5pfqQSDwOcrnxpR7xgBB2A4YBPeQL8P5JEmJ2owFn3xd9n663cVwfU49IF5cI4rXTl4jOFXa3S7LEGilVWr__OIhiiCXWL_kBPWMxGlaLqF5DhAXImlA",
 //   "accessTokenExpiresAt": "2024-06-14T17:12:24.448Z"
@@ -57,5 +52,16 @@ interface plists {
 ---
 
 <BaseLayout title="Your Playlists" existingUser={existingUser}>
-  {userPlaylists.map((plist: plists) => <p>{JSON.stringify(plist)}</p>)}
+  <h1>{existingUser.name}'s Public Spotify Playlists</h1>
+  <Playlisting playlistData={spotifyUserData.items} />
+  <!-- {
+    userPlaylists.map((plist: plists) => (
+      <LocalPlaylist playlistObject={plist} />
+    ))
+  } -->
 </BaseLayout>
+<style lang="scss">
+  h1 {
+    margin: var(--space-xl) 0;
+  }
+</style>
