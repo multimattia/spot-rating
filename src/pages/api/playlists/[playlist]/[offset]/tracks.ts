@@ -27,7 +27,7 @@ export async function GET(context: APIContext): Promise<Response> {
     .where(eq(existingUser.id, Session.userId));
 
   const spotifyTrackResponse = await fetch(
-    `https://api.spotify.com/v1/playlists/${playlistId}/tracks?fields=name%2C+items%28added_by.id%2C+added_at%2C+track%28name%2C+popularity%2C+id%2C+duration_ms%2Cartists%28name%29%2C+album%28name%2C+id%2Cimages%29%29&limit=100&offset=${offset}`,
+    `https://api.spotify.com/v1/playlists/${playlistId}/tracks?fields=name%2C+items%28added_by.id%2C+added_at%2C+track%28name%2C+popularity%2C+id%2C+duration_ms%2Cartists%28name%2Cid%29%2C+album%28name%2C+id%2Cimages%29%29&limit=100&offset=${offset}`,
     {
       headers: {
         Authorization: `Bearer ${session[0].accessToken}`,
@@ -59,7 +59,7 @@ export async function GET(context: APIContext): Promise<Response> {
   if (spotifyTrackResponse.ok && playlistId) {
     spotifyTrackData = await spotifyTrackResponse.json();
     try {
-      insertSongWithRelations(spotifyTrackData.items, newPlaylist);
+      await insertSongWithRelations(spotifyTrackData.items, newPlaylist);
     } catch (e) {
       console.error(e);
     }

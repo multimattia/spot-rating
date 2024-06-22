@@ -101,6 +101,14 @@ import { join } from "node:path";
       )
     }
     <main>
+      <div class="dbcluster">
+        <a href="/db/artistdb">artists</a>
+        <a href="/db/songsdb">songs</a>
+        <a href="/db/albumdb">albums</a>
+        <a href="/db/playlistdb">playlists</a>
+        <a href="/db/contributordb">contributors</a>
+        <a href="/db/additionsdb">additions</a>
+      </div>
       <slot />
     </main>
     <style>
@@ -108,6 +116,16 @@ import { join } from "node:path";
         margin: 0 auto;
         width: var(--window-width);
         padding: 0 var(--space-m);
+      }
+    </style>
+    <style lang="scss">
+      .dbcluster {
+        display: flex;
+        gap: var(--space-m);
+      }
+
+      .dbcluster a {
+        text-decoration: underline;
       }
     </style>
   </body>

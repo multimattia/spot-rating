@@ -3,7 +3,7 @@ const { songInfo } = Astro.props;
 
 import { formatDuration } from "src/lib/utils";
 
-type Song = {
+export type Song = {
   id: string;
   name: string;
   duration_ms: number;

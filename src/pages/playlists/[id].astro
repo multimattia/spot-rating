@@ -21,8 +21,6 @@ const existingUser = (
     .where(sql`${User.id} = ${luciaUser.id}`)
 )[0];
 
-console.log(existingUser);
-
 const session = await db
   .select()
   .from(Session)

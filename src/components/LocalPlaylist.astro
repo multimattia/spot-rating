@@ -27,20 +27,17 @@ const { playlistObject } = Astro.props;
 
 <style lang="scss">
   .playlist {
-    background-color: var(--grass-1);
     min-height: 20px;
+    border: 3px solid var(--amber-5);
+    background-color: var(--amber-1);
   }
 
   .playlist:hover {
-    background-color: var(--grass-2);
+    background-color: var(--amber-2);
   }
 
   .playlist::after {
-    color: var(--grass-5);
-  }
-
-  .playlist::after:hover {
-    color: var(--grass-2);
+    color: var(--amber-5);
   }
 
   .playlist * {
@@ -53,7 +50,7 @@ const { playlistObject } = Astro.props;
   playlistItems.forEach((div) => {
     div.addEventListener("click", (e) => {
       e.stopPropagation();
-      div.setAttribute("data-content", "Loading...");
+      div.setAttribute("data-content", "Opening...");
     });
   });
 </script>

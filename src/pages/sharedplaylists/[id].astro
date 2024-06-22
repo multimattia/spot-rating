@@ -5,6 +5,8 @@ import { Image } from "astro:assets";
 import LocalSong from "@components/LocalSong.astro";
 import BaseLayout from "@layouts/BaseLayout.astro";
 
+import type { Song } from "@components/LocalSong.astro";
+
 const luciaUser = Astro.locals.user;
 if (!luciaUser) {
   return Astro.redirect("/login");
@@ -53,7 +55,7 @@ console.log(JSON.stringify(playlistData, null, 2));
       <h5>{playlistData.description}</h5>
     </div>
   </div>
-  {savedSongs.map((item) => <LocalSong songInfo={item} />)}
+  {savedSongs.map((item: Song) => <LocalSong songInfo={item} />)}
 </BaseLayout>
 
 <style>

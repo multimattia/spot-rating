@@ -31,6 +31,7 @@ const Songs = defineTable({
     id: column.text({ primaryKey: true }),
     name: column.text(),
     duration_ms: column.number(),
+    spotifyId: column.text(),
     addedById: column.text(),
     playlistId: column.text({ references: () => Playlists.columns.id }),
     albumId: column.text(),
@@ -69,6 +70,77 @@ const Songs_Temp = defineTable({
   ],
 });
 
+const Contributors_Temp = defineTable({
+  columns: {
+    id: column.text({ primaryKey: true }),
+    spotifyId: column.text(),
+  },
+  indexes: [{ on: ["id"] }],
+});
+
+const ContributorsSongsPlaylists_Temp = defineTable({
+  columns: {
+    id: column.text({ primaryKey: true }),
+    contributorId: column.text(),
+    songId: column.text(),
+    playlistId: column.text(),
+    addedAt: column.date(),
+  },
+  indexes: [{ on: ["contributorId", "songId", "playlistId"] }],
+});
+
+const Artists_Temp = defineTable({
+  columns: {
+    id: column.text({ primaryKey: true }),
+    name: column.text({ unique: true }),
+    spotifyId: column.text(),
+  },
+  indexes: [{ on: ["id"] }],
+});
+
+const Albums_Temp = defineTable({
+  columns: {
+    id: column.text({ primaryKey: true }),
+    name: column.text({ unique: true }),
+    spotifyId: column.text(),
+  },
+  indexes: [{ on: ["id"] }],
+});
+
+const SongArtists_Temp = defineTable({
+  columns: {
+    songId: column.text({ primaryKey: true }),
+    artistId: column.text(),
+  },
+  indexes: [{ on: ["songId", "artistId"], unique: true }],
+});
+
+const SongPlaylists_Temp = defineTable({
+  columns: {
+    songId: column.text(),
+    playlistId: column.text(),
+    addedById: column.text(),
+    addedAt: column.date(),
+  },
+  indexes: [{ on: ["songId", "playlistId", "addedById"], unique: true }],
+});
+
+const SongAlbums_Temp = defineTable({
+  columns: {
+    songId: column.text(),
+    albumId: column.text(),
+  },
+  indexes: [{ on: ["songId", "albumId"], unique: true }],
+});
+
+const AlbumArtists_Temp = defineTable({
+  columns: {
+    albumId: column.text(),
+    artistId: column.text(),
+  },
+  indexes: [{ on: ["albumId", "artistId"], unique: true }],
+});
+
 const SongStaging = defineTable({
   columns: {
     id: column.text({ primaryKey: true }),
@@ -95,12 +167,16 @@ const Albums = defineTable({
     name: column.text(),
   },
 });
+
 const SongPlaylists = defineTable({
   columns: {
-    id: column.text(),
+    id: column.text({ primaryKey: true }),
     songId: column.text({ references: () => Songs.columns.id }),
     playlistId: column.text({ references: () => Playlists.columns.id }),
+    addedById: column.text({ references: () => User.columns.id }),
+    addedAt: column.date(),
   },
+  indexes: [{ on: ["songId", "playlistId", "addedById"], unique: true }],
 });
 
 const SongArtist = defineTable({
@@ -166,7 +242,16 @@ export default defineDb({
     Session,
     User,
     Songs,
+    Artists,
+    Contributors_Temp,
+    ContributorsSongsPlaylists_Temp,
+    AlbumArtists_Temp,
+    Artists_Temp,
+    Albums_Temp,
     Songs_Temp,
+    SongAlbums_Temp,
+    SongArtists_Temp,
+    SongPlaylists_Temp,
     Albums,
     Comments,
     Playlists,
@@ -174,7 +259,6 @@ export default defineDb({
     SongArtist,
     SongPlaylists,
     SongAlbums,
-    Artists,
     SongStaging,
   },
 });
