@@ -1,0 +1,36 @@
+---
+const { id } = Astro.params;
+import { db, User, Playlists, Session, eq, sql } from "astro:db";
+import { Image } from "astro:assets";
+import BaseLayout from "@layouts/BaseLayout.astro";
+
+const luciaUser = Astro.locals.user;
+if (!luciaUser) {
+  return Astro.redirect("/login");
+}
+
+const existingUser = (
+  await db
+    .select()
+    .from(User)
+    .where(sql`${User.id} = ${luciaUser.id}`)
+)[0];
+
+const session = await db
+  .select()
+  .from(Session)
+  .where(eq(existingUser.id, Session.userId));
+
+const songResults = await db.select().from(Playlists);
+---
+
+<BaseLayout title="db:Playlists" existingUser={existingUser}>
+  <h3>DB: Playlists</h3>
+  {
+    songResults.map((song: { name: string; id: string }) => (
+      <p>
+        {song.name} {song.id}
+      </p>
+    ))
+  }
+</BaseLayout>

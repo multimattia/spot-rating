@@ -1,0 +1,56 @@
+---
+interface playlisttype {
+  id: string;
+  userId: string;
+  ownerId: string;
+  name: string;
+}
+
+import "@styles/components/PlaylistEntry.scss";
+
+const { playlistObject } = Astro.props;
+---
+
+<a
+  href={`/sharedplaylists/${playlistObject.id}`}
+  data-content={playlistObject.id}
+>
+  <div id={playlistObject.id} class="playlist" data-content="Open">
+    <h3 class="nowrap ellipsify">{playlistObject.name}</h3>
+    <h4>By {playlistObject.ownerId}</h4>
+    <p>
+      {playlistObject.songCount}
+      {playlistObject.songCount === 1 ? `song` : `songs`}
+    </p>
+  </div>
+</a>
+
+<style lang="scss">
+  .playlist {
+    min-height: 20px;
+    border: 3px solid var(--amber-5);
+    background-color: var(--amber-1);
+  }
+
+  .playlist:hover {
+    background-color: var(--amber-2);
+  }
+
+  .playlist::after {
+    color: var(--amber-5);
+  }
+
+  .playlist * {
+    z-index: 2;
+  }
+</style>
+
+<script>
+  const playlistItems = document.querySelectorAll(".playlist");
+  playlistItems.forEach((div) => {
+    div.addEventListener("click", (e) => {
+      e.stopPropagation();
+      div.setAttribute("data-content", "Opening...");
+    });
+  });
+</script>

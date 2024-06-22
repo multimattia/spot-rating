@@ -1,0 +1,134 @@
+---
+import MenuBar from "@components/MenuBar.astro";
+import { AstroFont } from "astro-font";
+import "@styles/reset.css";
+import "@styles/global.css";
+import "@styles/base.css";
+import "@styles/theme.css";
+const { title, existingUser, isSignedIn = true } = Astro.props;
+import { join } from "node:path";
+const url = `${import.meta.env.PROD ? `https://${import.meta.env.PUBLIC_VERCEL_URL}/login/spotify/callback` : "http://localhost:4321/login/spotify/callback"}`;
+---
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width" />
+    <meta name="generator" content={Astro.generator} />
+    <title>{title}</title>
+    <AstroFont
+      config={[
+        {
+          name: "KoblenzSerialRegular",
+          src: [
+            {
+              style: "normal",
+              path: join(
+                process.cwd(),
+                "public",
+                "fonts",
+                "KoblenzSerialRegular.woff2"
+              ),
+            },
+          ],
+          preload: true,
+          display: "swap",
+          cssVariable: "KoblenzRegular",
+          fallback: "sans-serif",
+        },
+        {
+          name: "TexGyreAdventorRegular",
+          src: [
+            {
+              style: "normal",
+              path: join(
+                process.cwd(),
+                "public",
+                "fonts",
+                "texgyreadventorregular.woff"
+              ),
+            },
+          ],
+          preload: true,
+          display: "swap",
+          cssVariable: "TexRegular",
+          fallback: "sans-serif",
+        },
+        {
+          name: "MontserratRegular",
+          src: [
+            {
+              style: "normal",
+              path: join(
+                process.cwd(),
+                "public",
+                "fonts",
+                "Montserrat-Regular.woff2"
+              ),
+            },
+          ],
+          preload: true,
+          display: "swap",
+          cssVariable: "Montserrat",
+          fallback: "sans-serif",
+        },
+        {
+          name: "MontserratSemiBold",
+          src: [
+            {
+              style: "normal",
+              path: join(
+                process.cwd(),
+                "public",
+                "fonts",
+                "Montserrat-SemiBold.woff2"
+              ),
+            },
+          ],
+          preload: true,
+          display: "swap",
+          cssVariable: "MontserratSemiBold",
+          fallback: "sans-serif",
+        },
+      ]}
+    />
+  </head>
+  <body>
+    {
+      isSignedIn ? (
+        <MenuBar isSignedIn={true} existingUser={existingUser} />
+      ) : (
+        <MenuBar avatarUrl="" displayName="" />
+      )
+    }
+    <main>
+      <div class="dbcluster">
+        <a href="/db/artistdb">artists</a>
+        <a href="/db/songsdb">songs</a>
+        <a href="/db/albumdb">albums</a>
+        <a href="/db/playlistdb">playlists</a>
+        <a href="/db/contributordb">contributors</a>
+        <a href="/db/additionsdb">additions</a>
+      </div>
+      <p>current url: {url}</p>
+      <slot />
+    </main>
+    <style>
+      main {
+        margin: 0 auto;
+        width: var(--window-width);
+        padding: 0 var(--space-m);
+      }
+    </style>
+    <style lang="scss">
+      .dbcluster {
+        display: flex;
+        gap: var(--space-m);
+      }
+
+      .dbcluster a {
+        text-decoration: underline;
+      }
+    </style>
+  </body>
+</html>

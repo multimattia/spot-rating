@@ -1,0 +1,66 @@
+---
+import { db, User, Session, Playlists, eq, sql } from "astro:db";
+import BaseLayout from "@layouts/BaseLayout.astro";
+import Playlisting from "@components/Playlisting.astro";
+const luciaUser = Astro.locals.user;
+if (!luciaUser) {
+  return Astro.redirect("/login");
+}
+
+const existingUser = (
+  await db
+    .select()
+    .from(User)
+    .where(sql`${User.id} = ${luciaUser.id}`)
+)[0];
+
+const session = await db
+  .select()
+  .from(Session)
+  .where(eq(existingUser.id, Session.userId));
+
+let spotifyUserData;
+const spotifyUserResponse = await fetch(
+  `https://api.spotify.com/v1/users/${existingUser.spotifyId}/playlists?offset=0&limit=100`,
+  {
+    headers: {
+      Authorization: `Bearer ${session[0].accessToken}`,
+    },
+  }
+);
+if (spotifyUserResponse.ok) {
+  spotifyUserData = await spotifyUserResponse.json();
+} else {
+  console.error(
+    "error: ",
+    spotifyUserResponse.status,
+    spotifyUserResponse.statusText
+  );
+  spotifyUserData = [];
+}
+
+// refreshed: {
+//   "accessToken": "BQBfYyJTlJcFbg9bNLUQX1kZ6fvKpYFusSeG6eD25_hzBi9jjgaTSyMGYNM_DP5pfqQSDwOcrnxpR7xgBB2A4YBPeQL8P5JEmJ2owFn3xd9n663cVwfU49IF5cI4rXTl4jOFXa3S7LEGilVWr__OIhiiCXWL_kBPWMxGlaLqF5DhAXImlA",
+//   "accessTokenExpiresAt": "2024-06-14T17:12:24.448Z"
+// }
+---
+
+<BaseLayout title="Your Playlists" existingUser={existingUser}>
+  <h1>{existingUser.name}'s Public Spotify Playlists</h1>
+  <h4>
+    Don't see what you're looking for? Make sure the playlist is visible from
+    your profile!
+  </h4>
+  <Playlisting playlistData={spotifyUserData.items} />
+</BaseLayout>
+<style lang="scss">
+  h1 {
+    margin: var(--space-xl) 0 var(--space-2xs) 0;
+  }
+
+  h4 {
+    color: var(--gray-11);
+    font-size: var(--step-0);
+    margin-bottom: var(--space-m);
+  }
+</style>
