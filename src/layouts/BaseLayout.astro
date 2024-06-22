@@ -7,7 +7,7 @@ import "@styles/base.css";
 import "@styles/theme.css";
 const { title, existingUser, isSignedIn = true } = Astro.props;
 import { join } from "node:path";
-const url = `${import.meta.env.PROD ? `https://${import.meta.env.PUBLIC_VERCEL_URL}` : "http://localhost:4321/login/spotify/callback"}`;
+const url = `${import.meta.env.PROD ? `https://${import.meta.env.PUBLIC_VERCEL_URL}/login/spotify/callback` : "http://localhost:4321/login/spotify/callback"}`;
 ---
 
 <html lang="en">
