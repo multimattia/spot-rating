@@ -23,6 +23,7 @@
     "cssnano": "^7.0.3",
     "lucia": "^3.2.0",
     "lucia-adapter-astrodb": "^0.0.9",
+    "sharp": "^0.33.4",
     "typescript": "^5.4.5",
     "uuid": "^10.0.0"
   },
