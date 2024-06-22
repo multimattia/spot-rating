@@ -6,7 +6,7 @@ import { db, Session, User } from "astro:db";
 export const spotify = new Spotify(
   import.meta.env.SPOTIFY_CLIENT_ID,
   import.meta.env.SPOTIFY_CLIENT_SECRET,
-  "http://localhost:4321/login/spotify/callback"
+  `${import.meta.env.PROD ? `https://${import.meta.env.PUBLIC_VERCEL_URL}` : "http://localhost:4321/login/spotify/callback"}`,
 );
 
 const adapter = new AstroDBAdapter(db as any, Session, User);
