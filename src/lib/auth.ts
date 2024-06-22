@@ -3,7 +3,8 @@ import { AstroDBAdapter } from "lucia-adapter-astrodb";
 import { Spotify } from "arctic";
 import { db, Session, User } from "astro:db";
 
-const callbackUrl = `${import.meta.env.PROD ? `https://${import.meta.env.PUBLIC_VERCEL_URL}/login/spotify/callback` : "http://localhost:4321/login/spotify/callback"}`;
+let callbackUrl = `${import.meta.env.PROD ? `https://${import.meta.env.PUBLIC_VERCEL_URL}/login/spotify/callback` : "http://localhost:4321/login/spotify/callback"}`;
+callbackUrl = import.meta.env.PROD_URL || callbackUrl;
 
 export const spotify = new Spotify(
   import.meta.env.SPOTIFY_CLIENT_ID,
