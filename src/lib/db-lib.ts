@@ -56,13 +56,11 @@ const flattenTrack = (trackObject: PlaylistTrackObject, playlistId: string) => {
     };
 
     const artistsData = {
-      id: dummyArtistId,
       name: "Local artist",
       spotifyId: dummyArtistId,
     };
 
     const albumData = {
-      id: dummyAlbumId,
       name: "Local file",
       spotifyId: dummyAlbumId,
     };

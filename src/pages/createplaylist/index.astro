@@ -1,30 +1,12 @@
 ---
-import { db, User, Session, eq, sql } from "astro:db";
 import Playlisting from "@components/Playlisting.astro";
 import BaseLayout from "@layouts/BaseLayout.astro";
-const luciaUser = Astro.locals.user;
-console.log(luciaUser);
-if (!luciaUser) {
-  return Astro.redirect("/login");
-}
-
-const existingUser = (
-  await db
-    .select()
-    .from(User)
-    .where(sql`${User.id} = ${luciaUser.id}`)
-)[0];
-
-const session = await db
-  .select()
-  .from(Session)
-  .where(eq(existingUser.id, Session.userId));
 
 const spotifyUserResponse = await fetch(
-  `https://api.spotify.com/v1/users/${existingUser.spotifyId}/playlists?offset=0&limit=100`,
+  `https://api.spotify.com/v1/users/${Astro.locals.currentUser.spotifyId}/playlists?offset=0&limit=100`,
   {
     headers: {
-      Authorization: `Bearer ${session[0].accessToken}`,
+      Authorization: `Bearer ${Astro.locals.accessToken}`,
     },
   }
 );
@@ -46,6 +28,6 @@ if (spotifyUserResponse.ok) {
 // }
 ---
 
-<BaseLayout title="Create a playlist" existingUser={existingUser}>
+<BaseLayout title="Create a playlist" existingUser={Astro.locals.currentUser}>
   <Playlisting playlistData={spotifyUserData.items} />
 </BaseLayout>

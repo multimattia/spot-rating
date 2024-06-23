@@ -8,9 +8,20 @@ declare namespace App {
     accessTokenExpiresAt: Date;
   }
 
+  interface SpotifyUser {
+    id: string;
+    url: string;
+    name: string;
+    spotifyId: string;
+    updatedAt: string;
+    createdAt: string;
+  }
+
   interface Locals {
     session: import("lucia").Session | null;
     user: import("lucia").User | null;
+    currentUser: SpotifyUser;
+    accessToken: String;
     dbUser: User | null;
     tokens: Token | null;
     isLoggedIn: boolean;

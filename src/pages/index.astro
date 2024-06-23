@@ -2,17 +2,6 @@
 import BaseLayout from "@layouts/BaseLayout.astro";
 import { db, User, Playlists, Songs_Temp, eq, sql, desc } from "astro:db";
 import LocalPlaylist from "@components/LocalPlaylist.astro";
-const luciaUser = Astro.locals.user;
-if (!luciaUser) {
-  return Astro.redirect("/login");
-}
-
-const existingUser = (
-  await db
-    .select()
-    .from(User)
-    .where(sql`${User.id} = ${luciaUser.id}`)
-)[0];
 
 const playlistsWithLength = await db
   .select({
@@ -24,7 +13,7 @@ const playlistsWithLength = await db
   .from(Playlists)
   .leftJoin(Songs_Temp, eq(Playlists.id, Songs_Temp.playlistId))
   .leftJoin(User, eq(Playlists.ownerId, User.spotifyId))
-  .where(eq(Playlists.userId, existingUser.id))
+  .where(eq(Playlists.userId, Astro.locals.currentUser.id))
   .groupBy(Playlists.id, User.name)
   .orderBy(desc(Playlists.createdAt))
   .execute();
@@ -41,8 +30,12 @@ interface plists {
 }
 ---
 
-<BaseLayout isSignedIn={true} title=`Boomboxd` existingUser={existingUser}>
-  <h1>{existingUser.name}'s Published Mixtapes</h1>
+<BaseLayout
+  isSignedIn={true}
+  title=`Boomboxd`
+  existingUser={Astro.locals.currentUser}
+>
+  <h1>{Astro.locals.currentUser.name}'s Published Mixtapes</h1>
   {
     playlistsWithLength.map((plist: plists) => (
       <LocalPlaylist playlistObject={plist} />
