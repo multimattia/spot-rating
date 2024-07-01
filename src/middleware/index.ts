@@ -43,14 +43,18 @@ export const onRequest = defineMiddleware(async (context, next) => {
   }
 
   const sessionId = context.cookies.get(lucia.sessionCookieName)?.value ?? null;
+  console.log(`Sessionid: ${sessionId}`);
 
   if (!sessionId) {
+    console.log(`no session id:`);
     context.locals.user = null;
     context.locals.session = null;
     return next();
   }
 
   const { session, user } = await lucia.validateSession(sessionId);
+  console.log(`lucia session: ${session}`);
+  console.log(`lucia user: ${user}`);
 
   if (!user) {
     return new Response(null, {
@@ -63,6 +67,7 @@ export const onRequest = defineMiddleware(async (context, next) => {
 
   if (session && session.fresh) {
     const sessionCookie = lucia.createSessionCookie(session.id);
+    console.log(`lucia sessionCookie, fresh: ${sessionCookie}`);
     context.cookies.set(
       sessionCookie.name,
       sessionCookie.value,
@@ -71,6 +76,7 @@ export const onRequest = defineMiddleware(async (context, next) => {
   }
   if (!session) {
     const sessionCookie = lucia.createBlankSessionCookie();
+    console.log(`lucia sessionCookie no session: ${sessionCookie}`);
     context.cookies.set(
       sessionCookie.name,
       sessionCookie.value,
@@ -87,6 +93,7 @@ export const onRequest = defineMiddleware(async (context, next) => {
         .from(User)
         .where(sql`${User.id} = ${session ? session.userId : ""}`)
     )[0];
+    console.log(`existing user: ${existingUser}`);
 
     currentSession = await db
       .select({ accessToken: Session.accessToken })
@@ -96,11 +103,11 @@ export const onRequest = defineMiddleware(async (context, next) => {
 
     context.locals.accessToken = currentSession[0].accessToken!;
   } catch (e) {
-    existingUser = {
-      currentUser: {
-        name: "ERROR",
-      },
-    };
+    // existingUser = {
+    //   currentUser: {
+    //     name: "ERROR",
+    //   },
+    // };
     console.log(
       `existingUser ${existingUser} or currentSession ${currentSession}`,
     );
@@ -109,17 +116,18 @@ export const onRequest = defineMiddleware(async (context, next) => {
 
   context.locals.session = session;
   context.locals.user = user;
+  console.log(`existingUser: ${existingUser}`);
   // if (context.locals.currentUser) {
   context.locals.currentUser = {
     ...existingUser!,
-    url: existingUser.url || "no url",
-    id: existingUser.id || "no id",
-    name: existingUser.name || "no name",
-    spotifyId: existingUser.spotifyId || "No spotifyid",
-    updatedAt:
-      existingUser.updatedAt?.toISOString() || new Date().toISOString(),
-    createdAt:
-      existingUser.createdAt?.toISOString() || new Date().toISOString(),
+    // url: existingUser.url || "no url",
+    // id: existingUser.id || "no id",
+    // name: existingUser.name || "no name",
+    // spotifyId: existingUser.spotifyId || "No spotifyid",
+    // updatedAt:
+    //   existingUser.updatedAt?.toISOString() || new Date().toISOString(),
+    // createdAt:
+    //   existingUser.createdAt?.toISOString() || new Date().toISOString(),
   };
   // }
   if (context.locals.user) {
