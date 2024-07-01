@@ -31,7 +31,6 @@ export async function GET(context: APIContext): Promise<Response> {
 
     if (existingUser.length !== 0) {
       const session = await lucia.createSession(existingUser[0].id, {});
-      console.log(`existinguser id: ${existingUser[0].id}`);
       await db
         .update(Session)
         .set({
@@ -40,26 +39,23 @@ export async function GET(context: APIContext): Promise<Response> {
           tokenExpires: tokens.accessTokenExpiresAt,
         })
         .where(eq(Session.userId, existingUser[0].id));
-      console.log(`session list: ${db.select().from(Session)}`);
       const sessionCookie = lucia.createSessionCookie(session.id);
       context.cookies.set(
         sessionCookie.name,
         sessionCookie.value,
-        sessionCookie.attributes
+        sessionCookie.attributes,
       );
       return context.redirect("/");
     }
 
     const userId = generateId(15);
-    await db
-      .insert(User)
-      .values({
-        id: userId,
-        spotifyId: spotifyUser.id,
-        name: spotifyUser.display_name,
-        avatar: spotifyUser.images[0].url,
-        uri: spotifyUser.uri,
-      });
+    await db.insert(User).values({
+      id: userId,
+      spotifyId: spotifyUser.id,
+      name: spotifyUser.display_name,
+      avatar: spotifyUser.images[0].url,
+      // uri: spotifyUser.uri,
+    });
     const session = await lucia.createSession(userId, {});
     console.log(`userId id: ${userId}`);
     await db
@@ -71,13 +67,13 @@ export async function GET(context: APIContext): Promise<Response> {
       })
       .where(eq(Session.userId, userId));
     console.log(
-      `session list: ${JSON.stringify(await db.select().from(Session))}`
+      `session list: ${JSON.stringify(await db.select().from(Session))}`,
     );
     const sessionCookie = lucia.createSessionCookie(session.id);
     context.cookies.set(
       sessionCookie.name,
       sessionCookie.value,
-      sessionCookie.attributes
+      sessionCookie.attributes,
     );
     return context.redirect("/");
   } catch (e) {

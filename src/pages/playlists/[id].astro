@@ -1,37 +1,16 @@
 ---
 const { id } = Astro.params;
-import { db, User, Session, Playlists, eq, sql } from "astro:db";
+import { db, Playlists } from "astro:db";
 import { Image } from "astro:assets";
-import type PlaylistReturnObject from "../../types/spotifyTypes.ts";
 import TrackListing from "@components/TrackListing.astro";
-import { spotify } from "src/lib/auth";
-import { GET } from "../api/playlists/[playlist]/[offset]/tracks.ts";
 import BaseLayout from "@layouts/BaseLayout.astro";
-// import { insertSongWithRelations } from "../../lib/db-lib";
-
-const luciaUser = Astro.locals.user;
-if (!luciaUser) {
-  return Astro.redirect("/login");
-}
-
-const existingUser = (
-  await db
-    .select()
-    .from(User)
-    .where(sql`${User.id} = ${luciaUser.id}`)
-)[0];
-
-const session = await db
-  .select()
-  .from(Session)
-  .where(eq(existingUser.id, Session.userId));
+import { spotify } from "src/lib/auth";
 
 const spotifyTrackResponse = await fetch(
-  // `https://api.spotify.com/v1/playlists/${id}?fields=name%2Cimages%28url%2C+width%2C+height%29%2C+followers%28total%29%2C+owner%28id%2Cdisplay_name%29%2C+tracks%28items%28added_at%2C+added_by%28id%29%2Ctrack%28name%2C+album%28images%28%29%2C+name%29%2Cartists%28name%29%2Cduration_ms%29%2Ctotal%29`,
   `https://api.spotify.com/v1/playlists/${id}?fields=name%2Cid%2Cimages%28url%2C+width%2C+height%29%2C+followers%28total%29%2C+owner%28id%2Cdisplay_name%29%2C`,
   {
     headers: {
-      Authorization: `Bearer ${session[0].accessToken}`,
+      Authorization: `Bearer ${Astro.locals.accessToken}`,
     },
   }
 );
@@ -39,11 +18,13 @@ const spotifyTrackResponse = await fetch(
 let spotifyTrackData;
 if (spotifyTrackResponse.ok) {
   spotifyTrackData = await spotifyTrackResponse.json();
+
+  console.log(JSON.stringify(spotifyTrackData, null, 2));
   try {
     await db.insert(Playlists).values({
-      id: spotifyTrackData.id,
-      userId: existingUser.id,
+      userId: Astro.locals.currentUser.id,
       ownerId: spotifyTrackData.owner.id,
+      spotifyId: spotifyTrackData.id,
       name: spotifyTrackData.name,
     });
   } catch (e) {
@@ -61,7 +42,7 @@ if (spotifyTrackResponse.ok) {
 
 <BaseLayout
   title={`Playlist: ${spotifyTrackData.name}`}
-  existingUser={existingUser}
+  existingUser={Astro.locals.currentUser}
 >
   <div class="playlist-header">
     <Image
