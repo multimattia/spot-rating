@@ -3,20 +3,20 @@ import BaseLayout from "@layouts/BaseLayout.astro";
 import { db, User, Playlists, Songs, eq, sql, desc } from "astro:db";
 import LocalPlaylist from "@components/LocalPlaylist.astro";
 
-const playlistsWithLength = await db
-  .select({
-    id: Playlists.id,
-    name: Playlists.name,
-    ownerId: User.name,
-    songCount: sql<number>`COUNT(${Songs.id})`.as("songCount"),
-  })
-  .from(Playlists)
-  .leftJoin(Songs, eq(Playlists.id, Songs.playlistId))
-  .leftJoin(User, eq(Playlists.ownerId, User.spotifyId))
-  .where(eq(Playlists.userId, Astro.locals.currentUser.id))
-  .groupBy(Playlists.id, User.name)
-  .orderBy(desc(Playlists.createdAt))
-  .execute();
+// const playlistsWithLength = await db
+//   .select({
+//     id: Playlists.id,
+//     name: Playlists.name,
+//     ownerId: User.name,
+//     songCount: sql<number>`COUNT(${Songs.id})`.as("songCount"),
+//   })
+//   .from(Playlists)
+//   .leftJoin(Songs, eq(Playlists.id, Songs.playlistId))
+//   .leftJoin(User, eq(Playlists.ownerId, User.spotifyId))
+//   .where(eq(Playlists.userId, Astro.locals.currentUser.id))
+//   .groupBy(Playlists.id, User.name)
+//   .orderBy(desc(Playlists.createdAt))
+//   .execute();
 
 // refreshed: {
 //   "accessToken": "BQBfYyJTlJcFbg9bNLUQX1kZ6fvKpYFusSeG6eD25_hzBi9jjgaTSyMGYNM_DP5pfqQSDwOcrnxpR7xgBB2A4YBPeQL8P5JEmJ2owFn3xd9n663cVwfU49IF5cI4rXTl4jOFXa3S7LEGilVWr__OIhiiCXWL_kBPWMxGlaLqF5DhAXImlA",

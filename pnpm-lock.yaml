@@ -50,6 +50,9 @@ dependencies:
   sharp:
     specifier: ^0.33.4
     version: 0.33.4
+  spot-rating:
+    specifier: 'link:'
+    version: 'link:'
   typescript:
     specifier: ^5.4.5
     version: 5.5.2

@@ -9,22 +9,8 @@ export async function GET(context: APIContext): Promise<Response> {
     });
   }
 
-  // const existingUser = (
-  //   await db
-  //     .select()
-  //     .from(User)
-  //     .where(
-  //       sql`${User.id} = ${context.locals.session ? context.locals.session.userId : ""}`,
-  //     )
-  // )[0];
-
   const playlistId = context.params.playlist;
   let offset = 0;
-
-  // const session = await db
-  //   .select()
-  //   .from(Session)
-  //   .where(eq(existingUser.id, Session.userId));
 
   console.log(`params: ${JSON.stringify(context.params)}`);
   console.log(`playlistId: ${playlistId}`);
