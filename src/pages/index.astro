@@ -35,7 +35,7 @@ interface plists {
   title=`Boomboxd`
   existingUser={Astro.locals.currentUser}
 >
-  <h1>{Astro.locals.currentUser.name}'s Published Mixtapes</h1>
+  <h1>{Astro.locals.currentUser.name || "No name's"}'s Published Mixtapes</h1>
   <!-- {
     playlistsWithLength.map((plist: plists) => (
       <LocalPlaylist playlistObject={plist} />
