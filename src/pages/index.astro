@@ -31,7 +31,7 @@ interface plists {
 ---
 
 <BaseLayout
-  isSignedIn={true}
+  isSignedIn={Astro.locals.currentUser ? true : false}
   title=`Boomboxd`
   existingUser={Astro.locals.currentUser}
 >
