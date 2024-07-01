@@ -1,6 +1,6 @@
 ---
 const { id } = Astro.params;
-import { db, Artists_Temp } from "astro:db";
+import { db } from "astro:db";
 import { Image } from "astro:assets";
 import BaseLayout from "@layouts/BaseLayout.astro";
 
@@ -9,16 +9,16 @@ if (!luciaUser) {
   return Astro.redirect("/login");
 }
 
-const artistResults = await db.select().from(Artists_Temp);
+// const artistResults = await db.select().from(Artists_Temp);
 ---
 
 <BaseLayout title="db:artists" existingUser={Astro.locals.currentUser}>
   <h3>DB: Artists</h3>
-  {
+  <!-- {
     artistResults.map((artist: { name: string; spotifyId: string }) => (
       <p>
         {artist.name}, id: {artist.spotifyId}
       </p>
     ))
-  }
+  } -->
 </BaseLayout>

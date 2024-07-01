@@ -1,14 +1,12 @@
 ---
 const { id } = Astro.params;
-import { db, ContributorsSongsPlaylists_Temp } from "astro:db";
+import { db } from "astro:db";
 import BaseLayout from "@layouts/BaseLayout.astro";
-
-const songResults = await db.select().from(ContributorsSongsPlaylists_Temp);
 ---
 
 <BaseLayout title="db:songs" existingUser={Astro.locals.currentUser}>
   <h3>DB: Songs</h3>
-  {
+  <!-- {
     songResults.map(
       (song: {
         id: string;
@@ -22,5 +20,5 @@ const songResults = await db.select().from(ContributorsSongsPlaylists_Temp);
         </p>
       )
     )
-  }
+  } -->
 </BaseLayout>

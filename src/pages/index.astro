@@ -1,6 +1,6 @@
 ---
 import BaseLayout from "@layouts/BaseLayout.astro";
-import { db, User, Playlists, Songs_Temp, eq, sql, desc } from "astro:db";
+import { db, User, Playlists, Songs, eq, sql, desc } from "astro:db";
 import LocalPlaylist from "@components/LocalPlaylist.astro";
 
 const playlistsWithLength = await db
@@ -8,10 +8,10 @@ const playlistsWithLength = await db
     id: Playlists.id,
     name: Playlists.name,
     ownerId: User.name,
-    songCount: sql<number>`COUNT(${Songs_Temp.id})`.as("songCount"),
+    songCount: sql<number>`COUNT(${Songs.id})`.as("songCount"),
   })
   .from(Playlists)
-  .leftJoin(Songs_Temp, eq(Playlists.id, Songs_Temp.playlistId))
+  .leftJoin(Songs, eq(Playlists.id, Songs.playlistId))
   .leftJoin(User, eq(Playlists.ownerId, User.spotifyId))
   .where(eq(Playlists.userId, Astro.locals.currentUser.id))
   .groupBy(Playlists.id, User.name)

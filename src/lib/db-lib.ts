@@ -3,26 +3,18 @@ import {
   User,
   Songs,
   Contributors_Temp,
-  ContributorsSongsPlaylists_Temp,
   Albums,
-  Albums_Temp,
-  Artists_Temp,
-  Songs_Temp,
-  SongPlaylists_Temp,
   SongAlbums,
-  SongAlbums_Temp,
-  SongArtists_Temp,
   Comments,
   Playlists,
   PlaylistComments,
   SongArtist,
   SongPlaylists,
   Artists,
-  SongStaging,
+  Song_Staging,
   sql,
   db,
   NOW,
-  AlbumArtists_Temp,
 } from "astro:db";
 
 import { v4 as uuidv4 } from "uuid";
@@ -36,386 +28,308 @@ type TablePlaylist = {
 };
 
 const flattenTrack = (trackObject: PlaylistTrackObject, playlistId: string) => {
-  let tryName = "No name";
   const dummyTrackId = uuidv4();
   const dummyAlbumId = uuidv4();
   const dummyArtistId = uuidv4();
-  if (trackObject.track === null) {
-    const dumbuuid = `null${JSON.stringify(trackObject.added_by)}${trackObject.added_at}`;
-    const preparedTrack = {
-      id: dummyTrackId,
-      name: tryName,
-      duration_ms: 0,
-      addedById: trackObject.added_by.id,
-      playlistId: playlistId,
-      spotifyId: dummyTrackId,
-      albumId: dummyAlbumId,
-      popularity: 0,
-      addedAt: new Date(trackObject.added_at),
-      artists: [],
-    };
+  // let tryName = "No name";
+  // if (trackObject.track === null) {
+  //   const dumbuuid = `null${JSON.stringify(trackObject.added_by)}${trackObject.added_at}`;
+  //   const preparedTrack = {
+  //     id: dummyTrackId,
+  //     name: tryName,
+  //     duration_ms: 0,
+  //     addedById: trackObject.added_by.id,
+  //     playlistId: playlistId,
+  //     spotifyId: dummyTrackId,
+  //     albumId: dummyAlbumId,
+  //     popularity: 0,
+  //     addedAt: new Date(trackObject.added_at),
+  //     artists: [],
+  //   };
 
-    const artistsData = {
-      name: "Local artist",
-      spotifyId: dummyArtistId,
-    };
+  //   const artistsData = {
+  //     name: "Local artist",
+  //     spotifyId: dummyArtistId,
+  //   };
 
-    const albumData = {
-      name: "Local file",
-      spotifyId: dummyAlbumId,
-    };
+  //   const albumData = {
+  //     name: "Local file",
+  //     spotifyId: dummyAlbumId,
+  //   };
 
-    const songArtistsData = {
-      songId: preparedTrack.id,
-      artistId: dumbuuid,
-    };
+  //   const songArtistsData = {
+  //     songId: preparedTrack.id,
+  //     artistId: dumbuuid,
+  //   };
 
-    const songAlbumData = {
-      songId: dummyTrackId,
-      albumId: dummyAlbumId,
-    };
+  //   const songAlbumData = {
+  //     songId: dummyTrackId,
+  //     albumId: dummyAlbumId,
+  //   };
 
-    const albumArtistsData = {
-      artistId: dummyArtistId,
-      albumId: dummyAlbumId,
-    };
+  //   const albumArtistsData = {
+  //     artistId: dummyArtistId,
+  //     albumId: dummyAlbumId,
+  //   };
 
-    const songPlaylistData = {
-      songId: preparedTrack.id,
-      playlistId: playlistId,
-      addedById: trackObject.added_by.id,
-      addedAt: new Date(trackObject.added_at),
-    };
+  //   const songPlaylistData = {
+  //     songId: preparedTrack.id,
+  //     playlistId: playlistId,
+  //     addedById: trackObject.added_by.id,
+  //     addedAt: new Date(trackObject.added_at),
+  //   };
 
-    // console.log(
-    //   `flatten missing track: no object: ${JSON.stringify(
-    //     {
-    //       song: preparedTrack,
-    //       artists: artistsData,
-    //       album: albumData,
-    //       albumArtists: albumArtistsData,
-    //       songArtists: songArtistsData,
-    //       songAlbum: songAlbumData,
-    //       songPlaylist: songPlaylistData,
-    //     },
-    //     null,
-    //     2,
-    //   )}`,
-    // );
+  //   // console.log(
+  //   //   `flatten missing track: no object: ${JSON.stringify(
+  //   //     {
+  //   //       song: preparedTrack,
+  //   //       artists: artistsData,
+  //   //       album: albumData,
+  //   //       albumArtists: albumArtistsData,
+  //   //       songArtists: songArtistsData,
+  //   //       songAlbum: songAlbumData,
+  //   //       songPlaylist: songPlaylistData,
+  //   //     },
+  //   //     null,
+  //   //     2,
+  //   //   )}`,
+  //   // );
 
-    return {
-      song: preparedTrack,
-      artists: artistsData,
-      album: albumData,
-      albumArtists: albumArtistsData,
-      songArtists: songArtistsData,
-      songAlbum: songAlbumData,
-      songPlaylist: songPlaylistData,
-    };
-  }
-  try {
-    const preparedTrack = {
-      id: `${trackObject.track.id ? trackObject.track.id : trackObject.track.name.slice(0, 5)}${trackObject.added_at}`,
-      name: trackObject.track.name,
-      duration_ms: trackObject.track.duration_ms
-        ? trackObject.track.duration_ms
-        : 0,
-      addedById: trackObject.added_by.id,
-      playlistId: playlistId,
-      spotifyId: trackObject.track.id ? trackObject.track.id : uuidv4(),
-      albumId: trackObject.track.album.id ? trackObject.track.id : uuidv4(),
-      popularity: trackObject.track.popularity
-        ? trackObject.track.popularity
-        : 0,
-      addedAt: new Date(trackObject.added_at),
-      artists: trackObject.track.artists,
-    };
-    // console.log(
-    //   `trackobject: artists ${JSON.stringify(trackObject.track.artists)}`,
-    // );
+  //   return {
+  //     song: preparedTrack,
+  //     artists: artistsData,
+  //     album: albumData,
+  //     albumArtists: albumArtistsData,
+  //     songArtists: songArtistsData,
+  //     songAlbum: songAlbumData,
+  //     songPlaylist: songPlaylistData,
+  //   };
+  // }
+  // try {
+  const preparedTrack = {
+    name: trackObject.track.name || "No Name",
+    duration_ms: trackObject.track.duration_ms || 0,
+    addedById: trackObject.added_by.id,
+    playlistId: playlistId,
+    spotifyId: trackObject.track.id || uuidv4(),
+    popularity: trackObject.track.popularity || 0,
+    addedAt: new Date(trackObject.added_at),
+    artists: trackObject.track.artists || "",
+  };
 
-    const artistsData = trackObject.track.artists.map((artist) => ({
-      id: artist.id ? artist.id : dummyArtistId,
-      name: artist.name,
-      spotifyId: artist.id ? artist.id : dummyArtistId,
-    }));
+  const preparedArtist = trackObject.track.artists.map((artist) => ({
+    name: artist.name || "No Name",
+    spotifyId: artist.id || dummyArtistId,
+  }));
 
-    const albumData = {
-      id: trackObject.track.album.id
-        ? trackObject.track.album.id
-        : dummyAlbumId,
-      name: trackObject.track.album.name ? trackObject.track.album.name : "N/A",
-      spotifyId: trackObject.track.album.id
-        ? trackObject.track.album.id
-        : dummyAlbumId,
-    };
+  const albumData = {
+    name: trackObject.track.album.name || "N/A",
+    spotifyId: trackObject.track.album.id || dummyAlbumId,
+  };
 
-    const albumArtistsData = trackObject.track.artists.map((artist) => ({
-      albumId: trackObject.track.album.id
-        ? trackObject.track.album.id
-        : dummyAlbumId,
-      artistId: artist.id ? artist.id : dummyArtistId,
-    }));
+  const albumArtistsData = trackObject.track.artists.map((artist) => ({
+    albumId: trackObject.track.album.id || dummyAlbumId,
+    artistId: artist.id || dummyArtistId,
+  }));
 
-    const songArtistsData = trackObject.track.artists.map((artist) => ({
-      songId: preparedTrack.id ? preparedTrack.id : dummyTrackId,
-      artistId: artist.id ? artist.id : dummyArtistId,
-    }));
+  const songArtistsData = trackObject.track.artists.map((artist) => ({
+    // songId: preparedTrack!.id ? "" : dummyTrackId,
+    artistId: artist.id ? artist.id : dummyArtistId,
+  }));
 
-    const songAlbumData = {
-      songId: preparedTrack.id,
-      albumId: trackObject.track.album.id
-        ? trackObject.track.album.id
-        : dummyAlbumId,
-    };
+  const songAlbumData = {
+    // songId: preparedTrack!.id,
+    albumId: trackObject.track.album.id || dummyAlbumId,
+  };
 
-    const songPlaylistData = {
-      songId: preparedTrack.id,
-      playlistId: playlistId,
-      addedById: trackObject.added_by.id,
-      addedAt: new Date(trackObject.added_at),
-    };
+  const songPlaylistData = {
+    // songId: preparedTrack.id,
+    playlistId: playlistId,
+    addedById: trackObject.added_by.id,
+    addedAt: new Date(trackObject.added_at),
+  };
 
-    // console.log(
-    //   `flatten no errorobject: ${JSON.stringify(
-    //     {
-    //       song: preparedTrack,
-    //       artists: artistsData,
-    //       album: albumData,
-    //       albumArtists: albumArtistsData,
-    //       songArtists: songArtistsData,
-    //       songAlbum: songAlbumData,
-    //       songPlaylist: songPlaylistData,
-    //     },
-    //     null,
-    //     2,
-    //   )}`,
-    // );
+  // console.log(
+  //   `flatten no errorobject: ${JSON.stringify(
+  //     {
+  //       song: preparedTrack,
+  //       artists: artistsData,
+  //       album: albumData,
+  //       albumArtists: albumArtistsData,
+  //       songArtists: songArtistsData,
+  //       songAlbum: songAlbumData,
+  //       songPlaylist: songPlaylistData,
+  //     },
+  //     null,
+  //     2,
+  //   )}`,
+  // );
 
-    return {
-      song: preparedTrack,
-      artists: artistsData,
-      album: albumData,
-      albumArtists: albumArtistsData,
-      songArtists: songArtistsData,
-      songAlbum: songAlbumData,
-      songPlaylist: songPlaylistData,
-    };
-  } catch (e) {
-    // will fix later
-    const dumbuuid = `null${JSON.stringify(trackObject.added_by)}${trackObject.added_at}`;
-    const preparedTrack = {
-      id: dummyTrackId,
-      name: tryName,
-      duration_ms: 0,
-      addedById: trackObject.added_by.id,
-      playlistId: playlistId,
-      spotifyId: dummyTrackId,
-      albumId: dummyAlbumId,
-      popularity: 0,
-      addedAt: new Date(trackObject.added_at),
-      artists: [],
-    };
+  return {
+    song: preparedTrack,
+    artists: preparedArtist,
+    album: albumData,
+    albumArtists: albumArtistsData,
+    songArtists: songArtistsData,
+    songAlbum: songAlbumData,
+    songPlaylist: songPlaylistData,
+  };
+  // } catch (e) {
+  //   // will fix later
+  //   const dumbuuid = `null${JSON.stringify(trackObject.added_by)}${trackObject.added_at}`;
+  //   const preparedTrack = {
+  //     id: dummyTrackId,
+  //     name: tryName,
+  //     duration_ms: 0,
+  //     addedById: trackObject.added_by.id,
+  //     playlistId: playlistId,
+  //     spotifyId: dummyTrackId,
+  //     albumId: dummyAlbumId,
+  //     popularity: 0,
+  //     addedAt: new Date(trackObject.added_at),
+  //     artists: [],
+  //   };
 
-    const artistsData = {
-      id: dummyArtistId,
-      name: "Local artist",
-      spotifyId: dummyArtistId,
-    };
+  //   const artistsData = {
+  //     id: dummyArtistId,
+  //     name: "Local artist",
+  //     spotifyId: dummyArtistId,
+  //   };
 
-    const albumData = {
-      id: dummyAlbumId,
-      name: "Local file",
-      spotifyId: dummyAlbumId,
-    };
+  //   const albumData = {
+  //     id: dummyAlbumId,
+  //     name: "Local file",
+  //     spotifyId: dummyAlbumId,
+  //   };
 
-    const songArtistsData = {
-      songId: preparedTrack.id,
-      artistId: dumbuuid,
-    };
+  //   const songArtistsData = {
+  //     songId: preparedTrack.id,
+  //     artistId: dumbuuid,
+  //   };
 
-    const songAlbumData = {
-      songId: dummyTrackId,
-      albumId: dummyAlbumId,
-    };
+  //   const songAlbumData = {
+  //     songId: dummyTrackId,
+  //     albumId: dummyAlbumId,
+  //   };
 
-    const albumArtistsData = {
-      artistId: dummyArtistId,
-      albumId: dummyAlbumId,
-    };
+  //   const albumArtistsData = {
+  //     artistId: dummyArtistId,
+  //     albumId: dummyAlbumId,
+  //   };
 
-    const songPlaylistData = {
-      songId: preparedTrack.id,
-      playlistId: playlistId,
-      addedById: trackObject.added_by.id,
-      addedAt: new Date(trackObject.added_at),
-    };
+  //   const songPlaylistData = {
+  //     songId: preparedTrack.id,
+  //     playlistId: playlistId,
+  //     addedById: trackObject.added_by.id,
+  //     addedAt: new Date(trackObject.added_at),
+  //   };
 
-    // console.log(
-    //   `flatten error: ${e}, object: ${JSON.stringify(
-    //     {
-    //       song: preparedTrack,
-    //       artists: artistsData,
-    //       album: albumData,
-    //       albumArtists: albumArtistsData,
-    //       songArtists: songArtistsData,
-    //       songAlbum: songAlbumData,
-    //       songPlaylist: songPlaylistData,
-    //     },
-    //     null,
-    //     2,
-    //   )}`,
-    // );
+  //   // console.log(
+  //   //   `flatten error: ${e}, object: ${JSON.stringify(
+  //   //     {
+  //   //       song: preparedTrack,
+  //   //       artists: artistsData,
+  //   //       album: albumData,
+  //   //       albumArtists: albumArtistsData,
+  //   //       songArtists: songArtistsData,
+  //   //       songAlbum: songAlbumData,
+  //   //       songPlaylist: songPlaylistData,
+  //   //     },
+  //   //     null,
+  //   //     2,
+  //   //   )}`,
+  //   // );
 
-    return {
-      song: preparedTrack,
-      artists: artistsData,
-      album: albumData,
-      albumArtists: albumArtistsData,
-      songArtists: songArtistsData,
-      songAlbum: songAlbumData,
-      songPlaylist: songPlaylistData,
-    };
-  }
+  //   return {
+  //     song: preparedTrack,
+  //     artists: artistsData,
+  //     album: albumData,
+  //     albumArtists: albumArtistsData,
+  //     songArtists: songArtistsData,
+  //     songAlbum: songAlbumData,
+  //     songPlaylist: songPlaylistData,
+  //   };
+  // }
 };
 
 export const insertSongWithRelations = async (
   tracks: PlaylistTrackObject[],
   playlistInfo: TablePlaylist,
 ) => {
-  const preparedData = tracks.map((item, i) => {
-    return flattenTrack(item, playlistInfo.id);
-  });
-  try {
-    await db.batch([
-      db
-        .insert(Songs_Temp)
-        .values(preparedData.map(({ song }) => song))
-        .onConflictDoNothing(),
-    ]);
-  } catch (e) {
-    console.error(`song table error: ${e}`);
-  }
-
-  try {
-    await db.batch([
-      db
-        .insert(Artists_Temp)
-        .values(preparedData.flatMap(({ artists }) => artists))
-        .onConflictDoNothing(),
-    ]);
-  } catch (e) {
-    console.error(`artist table error: ${e}`);
-  }
-  try {
-    await db.batch([
-      db
-        .insert(Albums_Temp)
-        .values(
-          preparedData.map(({ album }) => {
-            return album;
-          }),
-        )
-        .onConflictDoNothing(),
-    ]);
-  } catch (e) {
-    console.error(`album table error: ${e}`);
-  }
-
-  try {
-    await db.batch([
-      db
-        .insert(AlbumArtists_Temp)
-        .values(preparedData.flatMap(({ albumArtists }) => albumArtists))
-        .onConflictDoNothing(),
-    ]);
-  } catch (e) {
-    console.error(`album artist relational table error: ${e}`);
-  }
-
-  try {
-    await db.batch([
-      db
-        .insert(Contributors_Temp)
-        .values(
-          preparedData.map(({ song }) => ({
-            id: song.addedById || "Spotify",
-            name: song.addedById || "Spotify",
-            spotifyId: song.addedById,
-          })),
-        )
-        .onConflictDoNothing(),
-    ]);
-  } catch (e) {
-    console.error(`contributor relational table error: ${e}`);
-  }
-
-  try {
-    await db.batch([
-      db
-        .insert(ContributorsSongsPlaylists_Temp)
-        .values(
-          preparedData.map(({ song }) => ({
-            id: `${song.addedById || "Spotify"}-${song.id}-${song.playlistId}}`,
-            contributorId: song.addedById ? song.addedById : "Spotify",
-            songId: song.id,
-            playlistId: song.playlistId,
-            addedAt: song.addedAt,
-          })),
-        )
-        .onConflictDoNothing(),
-    ]);
-  } catch (e) {
-    console.error(`contributor relational table error: ${e}`);
-  }
-
-  try {
-    await db.batch([
-      db
-        .insert(SongPlaylists_Temp)
-        .values(preparedData.map(({ songPlaylist }) => songPlaylist))
-        .onConflictDoNothing(),
-    ]);
-  } catch (e) {
-    console.error(`song playlist relational table error: ${e}`);
-  }
+  // db.insert(Song_Staging).values(tracks.map((track: PlaylistTrackObject) => ({ id: track.track.id })) )
+  console.log(playlistInfo.id);
+  await db.insert(Song_Staging).values(
+    tracks.map((track) => ({
+      id: track.track.id || uuidv4(),
+      playlist_id: playlistInfo.id,
+      track_name: track.track.name || uuidv4(),
+      track_id: track.track.id || uuidv4(),
+      duration_ms: track.track.duration_ms || 0,
+      popularity: track.track.popularity || 0,
+      album_name: track.track.album.name || "No name",
+      album_id: track.track.album.id || uuidv4(),
+      artist_names:
+        track.track.artists.map((a) => a.name).join(",") || "No artist",
+      artist_ids: track.track.artists.map((a) => a.id).join(",") || uuidv4(),
+      added_by_id: track.added_by.id,
+      added_at: new Date(track.added_at),
+      raw_data: JSON.stringify(track),
+    })),
+  );
+  const stagingRecords = await db.select().from(Song_Staging);
+  console.log(JSON.stringify(stagingRecords.slice(0, 2)));
+  // processStagingData(stagingRecords);
 };
 
 // TODO: spotify-generated playlists
-export const processStagingData = async (playlistId: string) => {
-  try {
-    await db.batch([
-      db.insert(Songs).values(db.select().from(Songs_Temp)),
-      db.insert(Artists).values(db.select().from(Artists_Temp)),
-      db.insert(Albums).values(db.select().from(Albums_Temp)),
-      db.insert(SongArtist).values(
-        db
-          .select({
-            id: sql`${SongArtists_Temp.songId} || '-' || ${SongArtists_Temp.artistId}`,
-            songId: SongArtists_Temp.songId,
-            artistId: SongArtists_Temp.artistId,
+export const processStagingData = async (batch: any[]): Promise<void> => {
+  for (const row of batch) {
+    try {
+      const [song] = await db
+        .insert(Songs)
+        .values({
+          name: row.name,
+          duration_ms: row.duration_ms,
+          spotifyId: row.track_id,
+          addedById: row.added_by_id,
+          popularity: row.popularity,
+          playlistId: row.playlist_id,
+          addedAt: row.addedAt,
+        })
+        .onConflictDoUpdate({
+          target: Songs.spotifyId,
+          set: {
+            name: row.name,
+            duration_ms: row.duration_ms,
+            popularity: row.popularity,
+            addedAt: row.addedAt,
+          },
+        })
+        .returning();
+    } catch (e) {
+      console.log("error processing initial songs");
+      console.error(e);
+    }
+    try {
+      for (const artistData of row.artists) {
+        const [artist] = await db
+          .insert(Artists)
+          .values({
+            name: artistData.name,
+            spotifyId: artistData.added_by_id,
           })
-          .from(SongArtists_Temp),
-      ),
-      db.insert(SongAlbums).values(
-        db
-          .select({
-            id: `sql${SongAlbums_Temp.songId} || '-' || ${SongAlbums_Temp.albumId}`,
-            songId: SongAlbums_Temp.songId,
-            albumId: SongAlbums_Temp.albumId,
+          .onConflictDoUpdate({
+            target: Artists.spotifyId,
+            set: {
+              name: artistData.name,
+            },
           })
-          .from(SongAlbums_Temp),
-      ),
-    ]);
-
-    await db.batch([
-      db.delete(Songs_Temp),
-      db.delete(Artists_Temp),
-      db.delete(Albums_Temp),
-      db.delete(SongArtists_Temp),
-      db.delete(SongAlbums_Temp),
-    ]);
-  } catch (e) {
-    console.error(`Error processing stage data: ${e}`);
+          .returning();
+      }
+    } catch (e) {
+      console.log("error processing initial artists");
+      console.error(e);
+    }
+    // db.batch([await])
   }
 };

@@ -11,12 +11,27 @@ export interface ExtendedUser extends LuciaUser {
 
 export const onRequest = defineMiddleware(async (context, next) => {
   // console.log(context);
+  // will fix in time ;)
   if (context.url.pathname === "/_image") {
     return next();
   }
   if (context.url.pathname === "/logout") {
     return next();
   }
+  if (context.url.pathname === "/login") {
+    return next();
+  }
+
+  if (context.url.pathname === "/inngest") {
+    return next();
+  }
+  if (context.url.pathname === "/inngest/client") {
+    return next();
+  }
+  if (context.url.pathname === "/inngest/helloWorld") {
+    return next();
+  }
+
   if (context.url.pathname === "/login") {
     return next();
   }
@@ -76,10 +91,16 @@ export const onRequest = defineMiddleware(async (context, next) => {
     currentSession = await db
       .select({ accessToken: Session.accessToken })
       .from(Session)
-      .where(eq(existingUser.id, Session.userId));
+      .where(sql`${existingUser.id} = ${Session.userId}`);
+    // .where(eq(existingUser.id, Session.userId));
 
-    context.locals.accessToken = currentSession[0].accessToken;
+    context.locals.accessToken = currentSession[0].accessToken!;
   } catch (e) {
+    existingUser = {
+      currentUser: {
+        name: "ERROR",
+      },
+    };
     console.log(
       `existingUser ${existingUser} or currentSession ${currentSession}`,
     );
@@ -88,9 +109,21 @@ export const onRequest = defineMiddleware(async (context, next) => {
 
   context.locals.session = session;
   context.locals.user = user;
-  context.locals.currentUser = existingUser;
+  // if (context.locals.currentUser) {
+  context.locals.currentUser = {
+    ...existingUser!,
+    url: existingUser.url || "no url",
+    id: existingUser.id || "no id",
+    name: existingUser.name || "no name",
+    spotifyId: existingUser.spotifyId || "No spotifyid",
+    updatedAt:
+      existingUser.updatedAt?.toISOString() || new Date().toISOString(),
+    createdAt:
+      existingUser.createdAt?.toISOString() || new Date().toISOString(),
+  };
+  // }
   if (context.locals.user) {
-    context.locals.user.username = existingUser.name;
+    context.locals.user.username = existingUser!.name || "No name";
   }
   return next();
 });

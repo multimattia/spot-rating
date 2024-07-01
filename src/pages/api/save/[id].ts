@@ -9,15 +9,6 @@ export async function GET(context: APIContext): Promise<Response> {
     });
   }
 
-  const existingUser = (
-    await db
-      .select()
-      .from(User)
-      .where(
-        sql`${User.id} = ${context.locals.session ? context.locals.session.userId : ""}`,
-      )
-  )[0];
-
   const playlistId = context.params.id;
 
   const dbsongs = await db

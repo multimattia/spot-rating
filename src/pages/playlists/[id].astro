@@ -4,6 +4,7 @@ import { db, Playlists } from "astro:db";
 import { Image } from "astro:assets";
 import TrackListing from "@components/TrackListing.astro";
 import BaseLayout from "@layouts/BaseLayout.astro";
+import { spotify } from "src/lib/auth";
 
 const spotifyTrackResponse = await fetch(
   `https://api.spotify.com/v1/playlists/${id}?fields=name%2Cid%2Cimages%28url%2C+width%2C+height%29%2C+followers%28total%29%2C+owner%28id%2Cdisplay_name%29%2C`,
@@ -17,11 +18,12 @@ const spotifyTrackResponse = await fetch(
 let spotifyTrackData;
 if (spotifyTrackResponse.ok) {
   spotifyTrackData = await spotifyTrackResponse.json();
+  console.log(JSON.stringify(spotifyTrackData, null, 2));
   try {
     await db.insert(Playlists).values({
-      id: spotifyTrackData.id,
       userId: Astro.locals.currentUser.id,
       ownerId: spotifyTrackData.owner.id,
+      spotifyId: spotifyTrackData.id,
       name: spotifyTrackData.name,
     });
   } catch (e) {
