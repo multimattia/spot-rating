@@ -120,14 +120,14 @@ export const onRequest = defineMiddleware(async (context, next) => {
   // if (context.locals.currentUser) {
   context.locals.currentUser = {
     ...existingUser!,
-    // url: existingUser.url || "no url",
-    // id: existingUser.id || "no id",
-    // name: existingUser.name || "no name",
-    // spotifyId: existingUser.spotifyId || "No spotifyid",
-    // updatedAt:
-    //   existingUser.updatedAt?.toISOString() || new Date().toISOString(),
-    // createdAt:
-    //   existingUser.createdAt?.toISOString() || new Date().toISOString(),
+    url: existingUser!.url || "no url",
+    id: existingUser!.id || "no id",
+    name: existingUser!.name || "no name",
+    spotifyId: existingUser!.spotifyId || "No spotifyid",
+    updatedAt:
+      existingUser!.updatedAt?.toISOString() || new Date().toISOString(),
+    createdAt:
+      existingUser!.createdAt?.toISOString() || new Date().toISOString(),
   };
   // }
   if (context.locals.user) {
