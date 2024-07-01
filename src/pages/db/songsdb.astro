@@ -9,8 +9,8 @@ const songResults = await db.select().from(Song_Staging);
 <BaseLayout title="db:songs" existingUser={Astro.locals.currentUser}>
   <h3>DB: Songs</h3>
   {
-    songResults.map((song) => (
-      <p>{JSON.stringify(JSON.parse(song.raw_data))}</p>
-    ))
+    // songResults.map((song) => (
+    // <p>{JSON.stringify(JSON.parse(song.raw_data))}</p>
+    // ))
   }
 </BaseLayout>

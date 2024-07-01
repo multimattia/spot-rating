@@ -18,6 +18,7 @@ const spotifyTrackResponse = await fetch(
 let spotifyTrackData;
 if (spotifyTrackResponse.ok) {
   spotifyTrackData = await spotifyTrackResponse.json();
+
   console.log(JSON.stringify(spotifyTrackData, null, 2));
   try {
     await db.insert(Playlists).values({

@@ -36,11 +36,11 @@ interface plists {
   existingUser={Astro.locals.currentUser}
 >
   <h1>{Astro.locals.currentUser.name}'s Published Mixtapes</h1>
-  {
+  <!-- {
     playlistsWithLength.map((plist: plists) => (
       <LocalPlaylist playlistObject={plist} />
     ))
-  }
+  } -->
 </BaseLayout>
 
 <style lang="scss">

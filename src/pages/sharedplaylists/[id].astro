@@ -1,6 +1,6 @@
 ---
 const { id } = Astro.params;
-import { db, Songs_Temp, sql } from "astro:db";
+import { db, sql } from "astro:db";
 import { Image } from "astro:assets";
 import LocalSong from "@components/LocalSong.astro";
 import BaseLayout from "@layouts/BaseLayout.astro";
@@ -23,10 +23,10 @@ try {
 
 const playlistData = await playlistInfo.json();
 
-const savedSongs = await db
-  .select()
-  .from(Songs_Temp)
-  .where(sql`${id} = ${Songs_Temp.playlistId}`);
+// const savedSongs = await db
+//   .select()
+//   .from(Songs_Temp)
+//   .where(sql`${id} = ${Songs_Temp.playlistId}`);
 
 console.log(JSON.stringify(playlistData, null, 2));
 ---
@@ -45,7 +45,7 @@ console.log(JSON.stringify(playlistData, null, 2));
       <h5>{playlistData.description}</h5>
     </div>
   </div>
-  {savedSongs.map((item: Song) => <LocalSong songInfo={item} />)}
+  <!-- {savedSongs.map((item: Song) => <LocalSong songInfo={item} />)} -->
 </BaseLayout>
 
 <style>

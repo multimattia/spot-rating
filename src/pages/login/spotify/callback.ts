@@ -54,7 +54,7 @@ export async function GET(context: APIContext): Promise<Response> {
       spotifyId: spotifyUser.id,
       name: spotifyUser.display_name,
       avatar: spotifyUser.images[0].url,
-      uri: spotifyUser.uri,
+      // uri: spotifyUser.uri,
     });
     const session = await lucia.createSession(userId, {});
     console.log(`userId id: ${userId}`);
