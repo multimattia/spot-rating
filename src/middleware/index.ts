@@ -53,8 +53,6 @@ export const onRequest = defineMiddleware(async (context, next) => {
   }
 
   const { session, user } = await lucia.validateSession(sessionId);
-  console.log(`lucia session: ${session}`);
-  console.log(`lucia user: ${user}`);
 
   if (!user) {
     return new Response(null, {
@@ -132,6 +130,14 @@ export const onRequest = defineMiddleware(async (context, next) => {
   // }
   if (context.locals.user) {
     context.locals.user.username = existingUser!.name || "No name";
+  }
+  if (!context.locals.currentUser) {
+    return new Response(null, {
+      status: 302,
+      headers: {
+        Location: "/login",
+      },
+    });
   }
   return next();
 });

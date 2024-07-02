@@ -2,6 +2,7 @@
 import BaseLayout from "@layouts/BaseLayout.astro";
 import { db, User, Playlists, Songs, eq, sql, desc } from "astro:db";
 import LocalPlaylist from "@components/LocalPlaylist.astro";
+const username = Astro.locals.currentUser || "No name";
 
 // const playlistsWithLength = await db
 //   .select({
@@ -35,7 +36,15 @@ interface plists {
   title=`Boomboxd`
   existingUser={Astro.locals.currentUser}
 >
-  <h1>{Astro.locals.currentUser.name || "No name's"}'s Published Mixtapes</h1>
+  {
+    Astro.locals.currentUser ? (
+      <h1>{username}'s Published Mixtapes</h1>
+    ) : (
+      <a href="/login">
+        <h1>Sign in to Spotify!</h1>
+      </a>
+    )
+  }
   <!-- {
     playlistsWithLength.map((plist: plists) => (
       <LocalPlaylist playlistObject={plist} />
