@@ -5,6 +5,7 @@ type DemoEventSent = {
   data: {
     message: string;
     email?: string;
+    user?: any;
   };
 };
 

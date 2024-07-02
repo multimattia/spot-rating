@@ -1,10 +1,11 @@
 import { inngest } from "./client";
+import { db, User } from "astro:db";
 
 export default inngest.createFunction(
   { id: "hello-world" },
   { event: "demo/hello.world" },
   async ({ event, step }) => {
-    await step.sleep("wait-a-moment", "1s");
-    return { event, body: "Hello, World!" };
+    let albumResults = await db.select().from(User);
+    return { event, body: `${JSON.stringify(albumResults, null, 2)}` };
   },
 );
