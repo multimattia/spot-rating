@@ -1,9 +1,9 @@
 ---
 const { id } = Astro.params;
-import { db } from "astro:db";
 import BaseLayout from "@layouts/BaseLayout.astro";
+import { db, User } from "astro:db";
 
-// const albumResults = await db.select().from(Albums_Temp);
+const albumResults = await db.select().from(User);
 ---
 
 <BaseLayout title="db:albums" existingUser={Astro.locals.currentUser}>
