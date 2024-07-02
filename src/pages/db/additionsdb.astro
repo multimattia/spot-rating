@@ -2,6 +2,9 @@
 const { id } = Astro.params;
 import { db } from "astro:db";
 import BaseLayout from "@layouts/BaseLayout.astro";
+console.log(
+  `additionsdb: ${JSON.stringify(Astro.locals.currentUser, null, 2)}`
+);
 ---
 
 <BaseLayout title="db:songs" existingUser={Astro.locals.currentUser}>

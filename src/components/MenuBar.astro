@@ -9,7 +9,7 @@ import { Image } from "astro:assets";
       <h2>Boomboxd</h2>
     </a>
     {
-      isSignedIn ? (
+      existingUser ? (
         <span class="nav-cluster">
           <a id="create" href="/playlists">
             <p>Load from Spotify</p>

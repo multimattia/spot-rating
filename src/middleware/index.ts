@@ -131,6 +131,7 @@ export const onRequest = defineMiddleware(async (context, next) => {
   if (context.locals.user) {
     context.locals.user.username = existingUser!.name || "No name";
   }
+  console.log(`context.locals: ${JSON.stringify(context.locals, null, 2)}`);
   if (!context.locals.currentUser) {
     return new Response(null, {
       status: 302,
