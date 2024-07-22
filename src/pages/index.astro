@@ -44,15 +44,22 @@ interface plists {
       </a>
     )
   }
-  {
-    playlistsWithLength.map((plist: plists) => (
-      <LocalPlaylist playlistObject={plist} />
-    ))
-  }
+  <div class="playlists">
+    {
+      playlistsWithLength.map((plist: plists) => (
+        <LocalPlaylist playlistObject={plist} />
+      ))
+    }
+  </div>
 </BaseLayout>
 
 <style lang="scss">
   h1 {
     margin: var(--space-xl) 0;
+  }
+
+  .playlists {
+    display: flex;
+    flex-direction: column;
   }
 </style>

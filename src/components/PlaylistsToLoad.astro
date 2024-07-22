@@ -1,5 +1,5 @@
 ---
-import type { Playlist } from "../types/spotifyTypes.d.ts";
+import type { Playlist } from "../types/spotifyTypes";
 import { Image } from "astro:assets";
 
 let playlistDataArray: Playlist[];
@@ -18,7 +18,16 @@ import "@styles/components/PlaylistEntry.scss";
       <>
         <a href={`playlists/${item.id}`}>
           <div class="playlist" data-content="Load">
-            <Image src={item.images[0].url} alt="" width="100" height="100" />
+            <Image
+              src={
+                item.images
+                  ? item.images[0].url
+                  : "https://kagi.com/proxy/360_F_248426448_NVKLywWqArG2ADUxDq6QprtIzsF82dMF.jpg?c=l0oPx0FvhjhG2vnK29uE37OLQc-WdefmvQp_UcLKL29LDJEkeYiVhvf2KWXWGustLbBUuFUVTrSjFGd_d3GuBmPOffiZmHemGi6a-Uj_O0D_Dbnq01_FkRla6Ecmv6akMJ1xYVkRKnmiEtwwYeItBw%3D%3D"
+              }
+              alt=""
+              width="100"
+              height="100"
+            />
             <div class="desc">
               <h2 class="nowrap ellipsify">{item.name}</h2>
               <h4 class="nowrap ellipsify">by {item.owner.display_name}</h4>
@@ -45,6 +54,7 @@ import "@styles/components/PlaylistEntry.scss";
     align-items: center;
     min-height: calc(var(--space-2xl) * 3);
     // background-color: var(--amber-1);
+    background-color: var(--blue-12);
     gap: var(--space-m);
   }
 
@@ -53,20 +63,8 @@ import "@styles/components/PlaylistEntry.scss";
     object-fit: cover;
   }
 
-  .playlist:hover {
-    background-color: var(--grass-2);
-  }
-
-  .playlist {
-    background-color: var(--grass-1);
-  }
-
-  .playlist:hover {
-    background-color: var(--grass-2);
-  }
-
   .playlist::after {
-    color: var(--grass-5);
+    color: var(--blue-8);
   }
 
   .playlist * {

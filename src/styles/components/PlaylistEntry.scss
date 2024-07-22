@@ -7,10 +7,12 @@ a {
   overflow: hidden;
   padding: 20px;
   // background-color: var(--grass-4);
-  border: 3px solid var(--grass-4);
+  outline: 3px solid var(--blue-11);
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
   transition:
+    outline-offset 0.1s ease,
+    outline 0.1s ease,
     transform 0.2s ease,
     background-color 0.2s ease;
   margin: var(--space-2xs) var(--space-l);
@@ -23,7 +25,8 @@ a {
 }
 
 .playlist:hover {
-  background-color: var(--grass-3);
+  outline: 7px solid var(--blue-11);
+  outline-offset: -4px;
 }
 
 .playlist::after {

@@ -63,7 +63,7 @@ export const onRequest = defineMiddleware(async (context, next) => {
 
   if (session && session.fresh) {
     const sessionCookie = lucia.createSessionCookie(session.id);
-    console.log(`lucia sessionCookie, fresh: ${sessionCookie}`);
+    // console.log(`lucia sessionCookie, fresh: ${sessionCookie}`);
     context.cookies.set(
       sessionCookie.name,
       sessionCookie.value,
@@ -72,7 +72,7 @@ export const onRequest = defineMiddleware(async (context, next) => {
   }
   if (!session) {
     const sessionCookie = lucia.createBlankSessionCookie();
-    console.log(`lucia sessionCookie no session: ${sessionCookie}`);
+    // console.log(`lucia sessionCookie no session: ${sessionCookie}`);
     context.cookies.set(
       sessionCookie.name,
       sessionCookie.value,
@@ -89,7 +89,7 @@ export const onRequest = defineMiddleware(async (context, next) => {
         .from(User)
         .where(sql`${User.id} = ${session ? session.userId : ""}`)
     )[0];
-    console.log(`existing user: ${existingUser}`);
+    // console.log(`existing user: ${existingUser}`);
 
     currentSession = await db
       .select({ accessToken: Session.accessToken })
@@ -104,15 +104,15 @@ export const onRequest = defineMiddleware(async (context, next) => {
     //     name: "ERROR",
     //   },
     // };
-    console.log(
-      `existingUser ${existingUser} or currentSession ${currentSession}`,
-    );
+    // console.log(
+    //   `existingUser ${existingUser} or currentSession ${currentSession}`,
+    // );
     console.error(e);
   }
 
   context.locals.session = session;
   context.locals.user = user;
-  console.log(`existingUser: ${existingUser}`);
+  // console.log(`existingUser: ${existingUser}`);
   // if (context.locals.currentUser) {
   context.locals.currentUser = {
     ...existingUser!,
@@ -129,7 +129,7 @@ export const onRequest = defineMiddleware(async (context, next) => {
   if (context.locals.user) {
     context.locals.user.username = existingUser!.name || "No name";
   }
-  console.log(`context.locals: ${JSON.stringify(context.locals, null, 2)}`);
+  // console.log(`context.locals: ${JSON.stringify(context.locals, null, 2)}`);
   if (!context.locals.currentUser) {
     return new Response(null, {
       status: 302,

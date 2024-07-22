@@ -1,10 +1,10 @@
 ---
-import type { PlaylistTrackObject } from "../types/spotifyTypes.ts";
+import type { PlaylistTrackObject } from "../types/spotifyTypes";
 import { Image } from "astro:assets";
 
 let playlistDataArray: PlaylistTrackObject[];
 
-const { id } = Astro.props;
+const { playlistId } = Astro.props;
 
 let allTracksFetched;
 if ("trackData" in Astro.props && Array.isArray(Astro.props.trackData)) {
@@ -24,7 +24,7 @@ function formatDuration(durationMs: number) {
 <div class="main-list">
   <div id="count-cluster">
     <p id="song-count">0 songs</p>
-    <form method="get" action=`/api/save/${id}`>
+    <form method="get" action=`/api/save/${playlistId}`>
       <button id="post-playlist-button" class="disabled"
         >Add playlist to profile</button
       >
@@ -32,7 +32,7 @@ function formatDuration(durationMs: number) {
     <p id="fetch-indicator">Fetching playlist entries from Spotify...</p>
   </div>
   <playlist-id
-    data-id={id}
+    data-id={playlistId}
     data-all-fetched={allTracksFetched ? "yes" : "no"}
     class="playist-cluster"
   >
@@ -148,15 +148,15 @@ function formatDuration(durationMs: number) {
     display: flex;
     align-items: center;
     gap: 3.7rem;
-    border-top: 1px solid #ececec;
+    border-top: 1px solid #3e474f;
   }
 
   .playlist:nth-of-type(even) {
-    background-color: #fafafb;
+    background-color: #181d21;
   }
 
   .playlist:hover {
-    background-color: #ebebeb;
+    background-color: #3e474f;
     transition: all 0.2s ease-out;
   }
 </style>
@@ -285,7 +285,6 @@ function formatDuration(durationMs: number) {
           return response.json();
         })
         .then((data) => {
-          // Handle the response data
           data.items.forEach((song: SpotifyTrack) => {
             if (song.track !== null) {
               playlistElement?.appendChild(createPlaylistElement(song));
@@ -301,9 +300,7 @@ function formatDuration(durationMs: number) {
           fetchTracks(newOffset, false, data.items.length < 100);
         })
         .catch((error) => {
-          // Handle any errors
           console.error("Error:", error);
-          // fetchedData = [];
         });
 
       styleElement.textContent = cssContent;
@@ -361,13 +358,13 @@ function formatDuration(durationMs: number) {
     display: flex;
     align-items: center;
     gap: 3.7rem;
-    border-top: 1px solid #ececec;
+    border-top: 1px solid #3e474f;
   }
   .playlist:nth-of-type(even) {
-    background-color: #fafafb;
+    background-color: #14181C;
   }
   .playlist:hover {
-    background-color: #ebebeb;
+    background-color: #3e474f;
     transition: all 0.2s ease-out;
   }
   #loading-indicator {
@@ -381,7 +378,7 @@ function formatDuration(durationMs: number) {
   // const debouncedScroll = debounce(handleScroll, 200);
   // window.addEventListener("scroll", debouncedScroll);
 
-  class TrackListing extends HTMLElement {
+  class SpotifyTrackTable extends HTMLElement {
     constructor() {
       super();
       document.head.appendChild(styleElement);
@@ -393,5 +390,5 @@ function formatDuration(durationMs: number) {
       console.log(`alltracks: ${allTracksLoaded}`);
     }
   }
-  customElements.define("playlist-id", TrackListing);
+  customElements.define("playlist-id", SpotifyTrackTable);
 </script>

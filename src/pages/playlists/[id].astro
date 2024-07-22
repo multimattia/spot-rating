@@ -2,7 +2,7 @@
 const { id } = Astro.params;
 import { db, Playlists } from "astro:db";
 import { Image } from "astro:assets";
-import TrackListing from "@components/TrackListing.astro";
+import SpotifyTrackTable from "@components/SpotifyTrackTable.astro";
 import BaseLayout from "@layouts/BaseLayout.astro";
 import { spotify } from "src/lib/auth";
 
@@ -58,7 +58,7 @@ if (spotifyTrackResponse.ok) {
     </div>
   </div>
   <!-- <TrackListing trackData={spotifyTrackData.tracks.items} id={id} /> -->
-  <TrackListing id={id} />
+  <SpotifyTrackTable playlistId={id} />
 </BaseLayout>
 
 <style>
@@ -68,11 +68,11 @@ if (spotifyTrackResponse.ok) {
     display: flex;
     align-items: center;
     gap: 3rem;
-    background: rgb(0, 0, 0);
-    background: linear-gradient(
+    background: transparent;
+    /* background: linear-gradient(
       347deg,
       rgba(0, 0, 0, 0.17) 0%,
-      rgba(255, 255, 255, 1) 58%
-    );
+      rgba(0, 20, 50, 1) 58%
+    ); */
   }
 </style>

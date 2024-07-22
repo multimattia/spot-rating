@@ -123,9 +123,13 @@ const url = `${import.meta.env.PROD ? `https://${import.meta.env.PUBLIC_VERCEL_U
       .dbcluster {
         display: flex;
         gap: var(--space-m);
+        padding: 0;
+        padding-top: var(--space-m);
       }
-
       .dbcluster a {
+        text-decoration: none;
+      }
+      .dbcluster a:hover {
         text-decoration: underline;
       }
     </style>

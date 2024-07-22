@@ -28,16 +28,16 @@ const { playlistObject } = Astro.props;
 <style lang="scss">
   .playlist {
     min-height: 20px;
-    border: 3px solid var(--amber-5);
-    background-color: var(--amber-1);
+    outline: 3px solid var(--amber-11);
+    background-color: var(--amber-12);
   }
 
   .playlist:hover {
-    background-color: var(--amber-2);
+    outline: 7px solid var(--amber-11);
   }
 
   .playlist::after {
-    color: var(--amber-5);
+    color: var(--amber-10);
   }
 
   .playlist * {
