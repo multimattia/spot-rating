@@ -140,6 +140,10 @@ function formatDuration(durationMs: number) {
   }
 
   .desc p {
+    flex: 1;
+    min-width: 0;
+    white-space: nowrap;
+    overflow: hidden;
     text-overflow: ellipsis;
     text-align: start;
   }
@@ -335,7 +339,21 @@ function formatDuration(durationMs: number) {
   .track-cluster {
     display: flex;
     gap: 1rem;
+    width: 100%;
   }
+
+  .track-cluster > :first-child {
+    flex: 0 0 auto;
+  }
+
+  #track-name {
+    flex: 1;
+    min-width: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
   .playlist {
     height: 5rem;
   }
@@ -351,6 +369,10 @@ function formatDuration(durationMs: number) {
     gap: 1rem;
   }
   .desc p {
+    flex: 1;
+    min-width: 0;
+    white-space: nowrap;
+    overflow: hidden;
     text-overflow: ellipsis;
     text-align: start;
   }
