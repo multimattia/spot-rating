@@ -322,6 +322,24 @@ function formatDuration(durationMs: number) {
     }
   };
 
+  const sendLeaveEvent = () => {
+    // Send a request to your API
+    fetch(`/api/leave-playlist/`, {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        page: window.location.pathname,
+        timestamp: new Date().toISOString(),
+        playlistId: id,
+      }),
+    });
+  };
+
+  window.addEventListener("beforeunload", sendLeaveEvent);
+  window.addEventListener("routeChange", sendLeaveEvent);
+
   document.addEventListener("DOMContentLoaded", (e) => {
     fetchTracks(0, false, allTracksLoaded);
   });
