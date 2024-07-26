@@ -267,10 +267,12 @@ function formatDuration(durationMs: number) {
   let loadingTracks = false;
   let allTracksLoaded = false;
   let songCount = 0;
+
   const songCountElement = document.getElementById("song-count")!;
   const songLoadElement = document.getElementById("fetch-indicator")!;
   const playlistElement = document.querySelector("playlist-id")!;
   const postButtonElement = document.getElementById("post-playlist-button")!;
+
   const fetchTracks = (
     currentOffset = 0,
     isLoading = false,
