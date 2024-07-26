@@ -6,37 +6,42 @@ import SpotifyTrackTable from "@components/SpotifyTrackTable.astro";
 import BaseLayout from "@layouts/BaseLayout.astro";
 import { spotify } from "src/lib/auth";
 
-const spotifyTrackResponse = await fetch(
-  `https://api.spotify.com/v1/playlists/${id}?fields=name%2Cid%2Cimages%28url%2C+width%2C+height%29%2C+followers%28total%29%2C+owner%28id%2Cdisplay_name%29%2C`,
-  {
-    headers: {
-      Authorization: `Bearer ${Astro.locals.accessToken}`,
-    },
-  }
-);
-
 let spotifyTrackData;
-if (spotifyTrackResponse.ok) {
-  spotifyTrackData = await spotifyTrackResponse.json();
 
-  console.log(JSON.stringify(spotifyTrackData, null, 2));
-  try {
-    await db.insert(Playlists).values({
-      userId: Astro.locals.currentUser.id,
-      ownerId: spotifyTrackData.owner.id,
-      spotifyId: spotifyTrackData.id,
-      name: spotifyTrackData.name,
-    });
-  } catch (e) {
-    console.error(`id playlist endpoint error: ${e}`);
-  }
-} else {
-  console.error(
-    "error: ",
-    spotifyTrackResponse.status,
-    spotifyTrackResponse.statusText
+try {
+  const spotifyTrackResponse = await fetch(
+    `https://api.spotify.com/v1/playlists/${id}?fields=name%2Cid%2Cimages%28url%2C+width%2C+height%29%2C+followers%28total%29%2C+owner%28id%2Cdisplay_name%29%2C`,
+    {
+      headers: {
+        Authorization: `Bearer ${Astro.locals.accessToken}`,
+      },
+    }
   );
-  spotifyTrackData = [];
+
+  if (spotifyTrackResponse.ok) {
+    spotifyTrackData = await spotifyTrackResponse.json();
+
+    console.log(JSON.stringify(spotifyTrackData, null, 2));
+    try {
+      await db.insert(Playlists).values({
+        userId: Astro.locals.currentUser.id,
+        ownerId: spotifyTrackData.owner.id,
+        spotifyId: spotifyTrackData.id,
+        name: spotifyTrackData.name,
+      });
+    } catch (e) {
+      console.error(`id playlist endpoint error: ${e}`);
+    }
+  } else {
+    console.error(
+      "error: ",
+      spotifyTrackResponse.status,
+      spotifyTrackResponse.statusText
+    );
+    spotifyTrackData = [];
+  }
+} catch (e) {
+  console.error(e);
 }
 ---
 
