@@ -1,0 +1,93 @@
+---
+import { ViewTransitions } from "astro:transitions";
+import { join } from "node:path";
+import { AstroFont } from "astro-font";
+interface Props {
+  title: string;
+}
+const { title } = Astro.props;
+---
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width" />
+  <meta name="generator" content={Astro.generator} />
+  <title>{title}</title>
+  <ViewTransitions />
+  <AstroFont
+    config={[
+      {
+        name: "KoblenzSerialRegular",
+        src: [
+          {
+            style: "normal",
+            path: join(
+              process.cwd(),
+              "public",
+              "fonts",
+              "KoblenzSerialRegular.woff2"
+            ),
+          },
+        ],
+        preload: true,
+        display: "swap",
+        cssVariable: "KoblenzRegular",
+        fallback: "sans-serif",
+      },
+      {
+        name: "TexGyreAdventorRegular",
+        src: [
+          {
+            style: "normal",
+            path: join(
+              process.cwd(),
+              "public",
+              "fonts",
+              "texgyreadventorregular.woff"
+            ),
+          },
+        ],
+        preload: true,
+        display: "swap",
+        cssVariable: "TexRegular",
+        fallback: "sans-serif",
+      },
+      {
+        name: "MontserratRegular",
+        src: [
+          {
+            style: "normal",
+            path: join(
+              process.cwd(),
+              "public",
+              "fonts",
+              "Montserrat-Regular.woff2"
+            ),
+          },
+        ],
+        preload: true,
+        display: "swap",
+        cssVariable: "Montserrat",
+        fallback: "sans-serif",
+      },
+      {
+        name: "MontserratSemiBold",
+        src: [
+          {
+            style: "normal",
+            path: join(
+              process.cwd(),
+              "public",
+              "fonts",
+              "Montserrat-SemiBold.woff2"
+            ),
+          },
+        ],
+        preload: true,
+        display: "swap",
+        cssVariable: "MontserratSemiBold",
+        fallback: "sans-serif",
+      },
+    ]}
+  />
+</head>

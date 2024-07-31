@@ -21,7 +21,7 @@ declare namespace App {
     session: import("lucia").Session | null;
     user: import("lucia").User | null;
     currentUser: SpotifyUser;
-    accessToken: String;
+    accessToken: string;
     dbUser: User | null;
     tokens: Token | null;
     isLoggedIn: boolean;

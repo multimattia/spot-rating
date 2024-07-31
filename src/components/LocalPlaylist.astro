@@ -46,11 +46,15 @@ const { playlistObject } = Astro.props;
 </style>
 
 <script>
-  const playlistItems = document.querySelectorAll(".playlist");
-  playlistItems.forEach((div) => {
-    div.addEventListener("click", (e) => {
-      e.stopPropagation();
-      div.setAttribute("data-content", "Opening...");
+  if (window.location.pathname === "/") {
+    document.addEventListener("astro:page-load", () => {
+      const playlistItems = document.querySelectorAll(".playlist");
+      playlistItems.forEach((div) => {
+        div.addEventListener("click", (e) => {
+          e.stopPropagation();
+          div.setAttribute("data-content", "Opening...");
+        });
+      });
     });
-  });
+  }
 </script>

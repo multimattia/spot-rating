@@ -193,43 +193,45 @@ import { Image } from "astro:assets";
 </style>
 
 <script>
-  document.addEventListener("DOMContentLoaded", () => {
-    const dropdown = document.querySelector(".dropdown");
-    const button = dropdown!.querySelector("#dropdownMenu");
-    const actual = dropdown!.querySelector(".actual");
+  document.addEventListener("astro:page-load", () => {
+    document.addEventListener("DOMContentLoaded", () => {
+      const dropdown = document.querySelector(".dropdown");
+      const button = dropdown!.querySelector("#dropdownMenu");
+      const actual = dropdown!.querySelector(".actual");
 
-    let timeoutId: any;
+      let timeoutId: any;
 
-    const showDropdown = () => {
-      clearTimeout(timeoutId);
-      button!.setAttribute("aria-expanded", "true");
-      actual!.classList.add("show");
-    };
+      const showDropdown = () => {
+        clearTimeout(timeoutId);
+        button!.setAttribute("aria-expanded", "true");
+        actual!.classList.add("show");
+      };
 
-    const hideDropdown = () => {
-      timeoutId = setTimeout(() => {
-        button!.setAttribute("aria-expanded", "false");
-        actual!.classList.remove("show");
-      }, 250);
-    };
+      const hideDropdown = () => {
+        timeoutId = setTimeout(() => {
+          button!.setAttribute("aria-expanded", "false");
+          actual!.classList.remove("show");
+        }, 250);
+      };
 
-    dropdown!.addEventListener("mouseenter", showDropdown);
-    dropdown!.addEventListener("mouseleave", hideDropdown);
+      dropdown!.addEventListener("mouseenter", showDropdown);
+      dropdown!.addEventListener("mouseleave", hideDropdown);
 
-    button!.addEventListener("click", (e) => {
-      e.preventDefault();
-      const expanded = button!.getAttribute("aria-expanded") === "true";
-      if (expanded) {
-        hideDropdown();
-      } else {
-        showDropdown();
-      }
-    });
+      button!.addEventListener("click", (e) => {
+        e.preventDefault();
+        const expanded = button!.getAttribute("aria-expanded") === "true";
+        if (expanded) {
+          hideDropdown();
+        } else {
+          showDropdown();
+        }
+      });
 
-    document.addEventListener("click", (e) => {
-      if (!dropdown!.contains(e.target as Node)) {
-        hideDropdown();
-      }
+      document.addEventListener("click", (e) => {
+        if (!dropdown!.contains(e.target as Node)) {
+          hideDropdown();
+        }
+      });
     });
   });
 </script>

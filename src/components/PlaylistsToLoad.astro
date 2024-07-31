@@ -73,11 +73,15 @@ import "@styles/components/PlaylistEntry.scss";
 </style>
 
 <script>
-  const playlistItems = document.querySelectorAll(".playlist");
-  playlistItems.forEach((div) => {
-    div.addEventListener("click", (e) => {
-      e.stopPropagation();
-      div.setAttribute("data-content", "Loading...");
+  if (window.location.pathname === "/pages/playlists/") {
+    document.addEventListener("astro:page-load", () => {
+      const playlistItems = document.querySelectorAll(".playlist");
+      playlistItems.forEach((div) => {
+        div.addEventListener("click", (e) => {
+          e.stopPropagation();
+          div.setAttribute("data-content", "Loading...");
+        });
+      });
     });
-  });
+  }
 </script>
