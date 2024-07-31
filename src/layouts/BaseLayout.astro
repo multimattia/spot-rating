@@ -18,7 +18,6 @@ import { SpotifyPlayer } from "../components/react/SpotifyPlayer";
 <html lang="en">
   <CommonHead title={title} />
   <body>
-    <astro-token data-message={token}> </astro-token>
     {
       existingUser ? (
         <MenuBar existingUser={existingUser} />
@@ -59,3 +58,11 @@ import { SpotifyPlayer } from "../components/react/SpotifyPlayer";
   </style>
 
 </html>
+
+<script>
+  document.addEventListener('astro:before-preparation', () => console.log('Navigation started'));
+  document.addEventListener('astro:after-preparation', () => console.log('Navigation prepared'));
+  document.addEventListener('astro:before-swap', () => console.log('About to swap content'));
+  document.addEventListener('astro:after-swap', () => console.log('Content swapped'));
+  document.addEventListener('astro:page-load', () => console.log('New page fully loaded'));
+</script>

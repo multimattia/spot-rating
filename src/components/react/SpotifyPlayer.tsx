@@ -54,7 +54,7 @@ export const SpotifyPlayer = ({ token }: { token: string }) => {
       id: null,
     },
   });
-  console.log("firing component")
+  const componentId = (Math.random().toString(36).substr(2, 9));
 
   useEffect(() => {
     // console.log("useEffect firing")
@@ -107,6 +107,9 @@ export const SpotifyPlayer = ({ token }: { token: string }) => {
 
       player.connect();
     };
+    return () => {
+      console.log("player is unmounting!!")
+    }
   }, []);
 
   if (!is_active) {
