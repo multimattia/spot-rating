@@ -58,13 +58,13 @@ export const SpotifyPlayer = ({ token }: { token: string }) => {
 
   useEffect(() => {
     // console.log("useEffect firing")
-    // const script = document.createElement("script");
-    // script.type = "text/javascript";
-    // script.text = spotifyPlayerSDK;
-    // script.async = true;
+    const script = document.createElement("script");
+    script.type = "text/javascript";
+    script.text = spotifyPlayerSDK;
+    script.async = true;
 
-    // document.body.appendChild(script);
-    // console.log("appended script")
+    document.body.appendChild(script);
+    console.log("appended script")
 
     window.onSpotifyWebPlaybackSDKReady = () => {
     console.log("playback ready")
