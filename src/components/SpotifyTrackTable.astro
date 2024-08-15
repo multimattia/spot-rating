@@ -1,0 +1,439 @@
+---
+import type { PlaylistTrackObject } from "../types/spotifyTypes";
+import { Image } from "astro:assets";
+
+let playlistDataArray: PlaylistTrackObject[];
+
+const { playlistId } = Astro.props;
+
+let allTracksFetched;
+if ("trackData" in Astro.props && Array.isArray(Astro.props.trackData)) {
+  playlistDataArray = Astro.props.trackData as PlaylistTrackObject[];
+  allTracksFetched = playlistDataArray.length < 100;
+} else {
+  playlistDataArray = [];
+}
+
+function formatDuration(durationMs: number) {
+  const minutes = Math.floor(durationMs / 60000);
+  const seconds = Math.floor((durationMs % 60000) / 1000);
+  return `${minutes}:${seconds.toString().padStart(2, "0")}`;
+}
+---
+
+<div class="main-list">
+  <div id="count-cluster">
+    <p id="song-count">0 songs</p>
+    <form method="get" action=`/api/save/${playlistId}`>
+      <button id="post-playlist-button" class="disabled"
+        >Add playlist to profile</button
+      >
+    </form>
+    <p id="fetch-indicator">Fetching playlist entries from Spotify...</p>
+  </div>
+  <playlist-id
+    data-id={playlistId}
+    data-all-fetched={allTracksFetched ? "yes" : "no"}
+    class="playist-cluster"
+  >
+    <div class="desc header">
+      <p id="track-header">Title</p>
+      <p id="artist-names">Artist</p>
+      <p id="added-name">Added by</p>
+      <p id="duration-length">Duration</p>
+    </div>
+    {
+      playlistDataArray.map((item, index) => (
+        <div class="playlist">
+          <div class="desc">
+            <div class="track-cluster">
+              <Image
+                src={
+                  item.track?.album?.images[0]?.url
+                    ? item.track?.album?.images[0]?.url
+                    : "https://kagi.com/proxy/360_F_248426448_NVKLywWqArG2ADUxDq6QprtIzsF82dMF.jpg?c=l0oPx0FvhjhG2vnK29uE37OLQc-WdefmvQp_UcLKL29LDJEkeYiVhvf2KWXWGustLbBUuFUVTrSjFGd_d3GuBmPOffiZmHemGi6a-Uj_O0D_Dbnq01_FkRla6Ecmv6akMJ1xYVkRKnmiEtwwYeItBw%3D%3D"
+                }
+                alt=""
+                width="50"
+                height="50"
+              />
+              <p id="track-name">{item.track.name}</p>
+            </div>
+            <p id="artist-names">
+              {item.track.artists.map((artist) => artist.name).join(", ")}
+            </p>
+            <p id="added-name">
+              {item.added_by.id ? item.added_by.id : "Spotify"}
+            </p>
+            <p id="duration-length">{formatDuration(item.track.duration_ms)}</p>
+          </div>
+        </div>
+      ))
+    }
+  </playlist-id>
+  <div class="test"></div>
+</div>
+
+<style>
+  .disabled {
+    opacity: 0.5;
+    pointer-events: none;
+    cursor: not-allowed;
+  }
+
+  #count-cluster {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .main-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .loading-fade {
+    color: gray;
+  }
+
+  #track-header {
+    margin-left: 1rem;
+  }
+
+  .desc p {
+    width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  #track-name {
+    width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .track-cluster {
+    display: flex;
+    gap: 1rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .playlist {
+    height: 5rem;
+  }
+
+  .playlist img {
+    margin-left: 1rem;
+  }
+
+  .desc {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    width: 100%;
+    display: grid;
+    grid-template-columns: 3fr 2fr 2fr 1fr;
+    grid-template-rows: 1fr;
+    gap: 1rem;
+  }
+
+  .desc p {
+    flex: 1;
+    min-width: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    text-align: start;
+  }
+
+  .playlist {
+    display: flex;
+    align-items: center;
+    gap: 3.7rem;
+    border-top: 1px solid #3e474f;
+  }
+
+  .playlist:nth-of-type(even) {
+    background-color: #181d21;
+  }
+
+  .playlist:hover {
+    background-color: #3e474f;
+    transition: all 0.2s ease-out;
+  }
+</style>
+
+<script>
+  const cssContent = `
+  .main-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+  .header #track-name {
+    margin-left: 1rem;
+  }
+  .track-cluster {
+    display: flex;
+    gap: 1rem;
+    width: 100%;
+  }
+
+  .track-cluster > :first-child {
+    flex: 0 0 auto;
+  }
+
+  #track-name {
+    flex: 1;
+    min-width: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .playlist {
+    height: 5rem;
+  }
+  .playlist img {
+    margin-left: 1rem;
+  }
+  .desc {
+    text-overflow: ellipsis;
+    width: 100%;
+    display: grid;
+    grid-template-columns: 3fr 2fr 2fr 1fr;
+    grid-template-rows: 1fr;
+    gap: 1rem;
+  }
+  .desc p {
+    flex: 1;
+    min-width: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    text-align: start;
+  }
+  .playlist {
+    display: flex;
+    align-items: center;
+    gap: 3.7rem;
+    border-top: 1px solid #3e474f;
+  }
+  .playlist:nth-of-type(even) {
+    background-color: #14181C;
+  }
+  .playlist:hover {
+    background-color: #3e474f;
+    transition: all 0.2s ease-out;
+  }
+  #loading-indicator {
+    margin: 0 auto;
+    background-color: gray;
+    padding: 10rem 10rem;
+    display: none;
+  }
+  `;
+  const formatDuration = (durationMs: number) => {
+    const minutes = Math.floor(durationMs / 60000);
+    const seconds = Math.floor((durationMs % 60000) / 1000);
+    return `${minutes}:${seconds.toString().padStart(2, "0")}`;
+  };
+  interface SpotifyTrack {
+    track: {
+      album: {
+        images: {
+          height: number;
+          url: string;
+          width: number;
+        }[];
+        name: string;
+      };
+      artists: {
+        name: string;
+      }[];
+      duration_ms: number;
+      name: string;
+      popularity: number;
+    };
+    added_by: {
+      id: string;
+    };
+    added_at: string;
+  }
+
+  class SpotifyTrackTable extends HTMLElement {
+    globalOffset: number = 0;
+    loadingTracks: boolean = false;
+    allTracksLoaded: boolean = false;
+    songCount: number = 0;
+    id: string = "";
+    styleElement = document.createElement("style");
+    constructor() {
+      super();
+      this.globalOffset = 0;
+      this.loadingTracks = false;
+      this.allTracksLoaded = this.dataset.allFetched === "yes" ? true : false;
+      this.songCount = 0;
+      this.id = this.dataset.id ? this.dataset.id : "";
+      document.head.appendChild(this.styleElement);
+      this.styleElement.textContent = cssContent;
+    }
+
+    connectedCallback() {
+      this.initialize();
+    }
+
+    initialize() {
+      const allTracksLoaded = this.dataset.allFetched === "yes" ? true : false;
+
+      // Initialize other functionalities
+      this.initializeFunctionalities(this.id, allTracksLoaded);
+    }
+
+    initializeFunctionalities(id: string, allTracksLoaded: boolean) {
+      // Place all your existing functionality here
+      // (fetchTracks, createPlaylistElement, event listeners, etc.)
+      const songCountElement = document.getElementById("song-count")!;
+      const songLoadElement = document.getElementById("fetch-indicator")!;
+      const playlistElement = document.querySelector("playlist-id")!;
+      const postButtonElement = document.getElementById(
+        "post-playlist-button"
+      )!;
+
+      const fetchTracks = (
+        currentOffset = 0,
+        isLoading = false,
+        allLoaded = this.allTracksLoaded
+      ) => {
+        if (!this.loadingTracks && !allLoaded) {
+          if (songLoadElement) {
+            songLoadElement.style.display = "block";
+            songLoadElement.classList.add("loading-fade");
+          }
+          this.loadingTracks = true;
+          fetch(`/api/playlists/${id}/${this.globalOffset}/tracks/`)
+            .then((response) => {
+              return response.json();
+            })
+            .then((data) => {
+              data.items.forEach((song: SpotifyTrack) => {
+                if (song.track !== null) {
+                  playlistElement?.appendChild(createPlaylistElement(song));
+                }
+              });
+              this.globalOffset = this.globalOffset + 100;
+              this.loadingTracks = false;
+              if (songCountElement) {
+                this.songCount = this.songCount + data.items.length;
+                songCountElement.innerText = `${this.songCount} songs`;
+              }
+              // fetchTracks(newOffset, false, data.items.length < 100);
+              fetchTracks(this.globalOffset, false, data.items.length < 100);
+            })
+            .catch((error) => {
+              console.error("Error:", error);
+            });
+
+          this.styleElement.textContent = cssContent;
+        } else {
+          if (songLoadElement) {
+            songLoadElement.innerText = "All done!";
+            if (postButtonElement) {
+              postButtonElement.classList.remove("disabled");
+            }
+            setTimeout(() => {
+              songLoadElement.classList.remove("loading-fade");
+              songLoadElement.style.display = "none";
+            }, 1000);
+          }
+        }
+      };
+
+      const createPlaylistElement = (
+        fetchedTrack: SpotifyTrack
+      ): HTMLDivElement => {
+        const playlistDiv = document.createElement("div");
+        playlistDiv.className = "playlist";
+
+        const descDiv = document.createElement("div");
+        descDiv.className = "desc";
+        playlistDiv.appendChild(descDiv);
+
+        const cluster = document.createElement("div");
+        cluster.className = "track-cluster";
+        descDiv.appendChild(cluster);
+
+        const image = document.createElement("img");
+        image.src = fetchedTrack.track.album?.images[2]?.url
+          ? fetchedTrack.track.album.images[2].url
+          : "https://kagi.com/proxy/360_F_248426448_NVKLywWqArG2ADUxDq6QprtIzsF82dMF.jpg?c=l0oPx0FvhjhG2vnK29uE37OLQc-WdefmvQp_UcLKL29LDJEkeYiVhvf2KWXWGustLbBUuFUVTrSjFGd_d3GuBmPOffiZmHemGi6a-Uj_O0D_Dbnq01_FkRla6Ecmv6akMJ1xYVkRKnmiEtwwYeItBw%3D%3D";
+        image.alt = "";
+        image.width = 50;
+        image.height = 50;
+        cluster.appendChild(image);
+
+        const nameHeading = document.createElement("p");
+        nameHeading.textContent = fetchedTrack.track.name;
+        cluster.appendChild(nameHeading);
+
+        const artistsHeading = document.createElement("p");
+        artistsHeading.textContent = fetchedTrack.track.artists
+          .map((artist) => artist.name)
+          .join(", ");
+        descDiv.appendChild(artistsHeading);
+
+        const addedByPara = document.createElement("p");
+        addedByPara.textContent = fetchedTrack.added_by.id;
+        descDiv.appendChild(addedByPara);
+
+        const durationPara = document.createElement("p");
+        durationPara.textContent = formatDuration(
+          fetchedTrack.track.duration_ms
+        );
+        descDiv.appendChild(durationPara);
+
+        return playlistDiv;
+      };
+
+      fetchTracks(0, false);
+    }
+  }
+
+  if (
+    window.location.pathname.includes("/playlists/") &&
+    window.location.pathname.length !== 11
+  ) {
+    document.addEventListener("astro:page-load", () => {
+      let id: string;
+
+      const sendLeaveEvent = () => {
+        console.log("leaving...", id)
+        // Send a request to your API
+        fetch(`/api/leave-playlist/`, {
+          method: "DELETE",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            page: window.location.pathname,
+            timestamp: new Date().toISOString(),
+            playlistId: id,
+          }),
+        });
+      };
+
+      window.addEventListener("beforeunload", sendLeaveEvent);
+      window.addEventListener("routeChange", sendLeaveEvent);
+
+      document.addEventListener("DOMContentLoaded", (e) => {});
+
+      try {
+        customElements.define("playlist-id", SpotifyTrackTable);
+      } catch (err) {
+        // console.warn("playlist-id element already defined", err);
+      }
+    });
+  }
+</script>

@@ -9,25 +9,35 @@ import { Image } from "astro:assets";
       <h2>Boomboxd</h2>
     </a>
     {
-      isSignedIn ? (
+      existingUser ? (
         <span class="nav-cluster">
-          <a id="create" href="/playlists">
-            <p>Load from Spotify</p>
-          </a>
           <div class="user-cluster">
-            <Image
-              src={existingUser.avatar || "/public/image/placeholder.jpg"}
-              alt=""
-              height="40"
-              width="40"
-              loading="eager"
-              class="square"
-            />
-            <p>{existingUser.name}</p>
-            <form method="post" action="/api/logout">
-              <button>Sign out</button>
-            </form>
+            <div class="square-image-container">
+              <Image
+                src={existingUser.avatar || "/image/placeholder.jpg"}
+                alt=""
+                height="30"
+                width="30"
+                loading="eager"
+                class="square"
+              />
+            </div>
+            <div class="dropdown">
+              <p aria-haspopup="true" aria-expanded="false" id="dropdownMenu">
+                {existingUser.name}
+              </p>
+              <div class="actual" role="menu" aria-labelledby="dropdownMenu">
+                <form method="post" action="/api/logout">
+                  <button role="menuitem" id="sign-out">
+                    Sign out
+                  </button>
+                </form>
+              </div>
+            </div>
           </div>
+          <a id="create" href="/playlists">
+            <p>Publish</p>
+          </a>
         </span>
       ) : (
         <span class="user-cluster">
@@ -40,21 +50,51 @@ import { Image } from "astro:assets";
 </section>
 
 <style lang="scss">
-  .square {
-    object-fit: contain;
+  .square-image-container {
+    width: 30px;
+    height: 30px;
+    overflow: hidden;
+    position: relative;
   }
 
-  button {
+  .square {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    overflow: hidden;
+  }
+
+  #sign-out {
     font-size: var(--step-0);
+    color: #9ab;
+    background-color: transparent;
+    border: none;
+    cursor: pointer;
+  }
+
+  #sign-out:hover {
+    text-decoration: underline;
+  }
+
+  p {
+    color: #9ab;
   }
 
   #create {
-    border-radius: var(--radius-xs);
-    padding: var(--space-2xs);
+    border-radius: 0.15rem;
+    padding: 0.02rem 0.7rem;
     color: var(--grass-1);
     background-color: var(--grass-9);
     font-size: var(--step-0);
     text-decoration: none;
+  }
+
+  #create p {
+    color: white;
   }
 
   #create:hover {
@@ -64,15 +104,18 @@ import { Image } from "astro:assets";
   .title {
     flex-grow: 1;
     text-decoration: none;
-    color: var(--grass-12);
+    // color: var(--grass-12);
+    color: white;
   }
 
   .title h2 {
-    font-size: var(--step-2);
+    // font-size: var(--step-2);
+    font-size: white;
   }
 
-  .title:hover {
-    color: var(--grass-11);
+  .title h2:hover {
+    // color: var(--grass-11);
+    color: #9ab;
   }
 
   .nav-cluster {
@@ -89,16 +132,106 @@ import { Image } from "astro:assets";
   }
 
   section {
-    width: var(--window-width);
-    margin: 0 auto;
+    background-color: #14181c;
+    width: 100%;
   }
 
   nav {
-    width: 100%;
+    width: var(--window-width);
+    margin: 0 auto;
     padding: var(--space-m);
     display: flex;
-    // background-color: var(--grass-2);
     justify-content: space-around;
     align-items: center;
   }
+
+  .dropdown {
+    position: relative;
+    display: inline-block;
+  }
+
+  .dropdown button {
+    color: #333;
+    padding: var(--space-xs);
+    border: none;
+    cursor: pointer;
+  }
+
+  .actual {
+    display: none;
+    position: absolute;
+    background-color: #14181c;
+    min-width: 160px;
+    border-radius: var(--radius-xs);
+    z-index: 1;
+    right: 0;
+  }
+
+  .actual.show {
+    display: block;
+  }
+
+  .actual form {
+    padding: var(--space-2xs);
+  }
+
+  .actual button {
+    background-color: transparent;
+    color: black;
+    padding: 12px 16px;
+    text-decoration: none;
+    display: block;
+    width: 100%;
+    text-align: left;
+    border: none;
+    cursor: pointer;
+  }
+
+  .actual button:hover {
+    background-color: #14181c;
+  }
 </style>
+
+<script>
+  document.addEventListener("astro:page-load", () => {
+    document.addEventListener("DOMContentLoaded", () => {
+      const dropdown = document.querySelector(".dropdown");
+      const button = dropdown!.querySelector("#dropdownMenu");
+      const actual = dropdown!.querySelector(".actual");
+
+      let timeoutId: any;
+
+      const showDropdown = () => {
+        clearTimeout(timeoutId);
+        button!.setAttribute("aria-expanded", "true");
+        actual!.classList.add("show");
+      };
+
+      const hideDropdown = () => {
+        timeoutId = setTimeout(() => {
+          button!.setAttribute("aria-expanded", "false");
+          actual!.classList.remove("show");
+        }, 250);
+      };
+
+      dropdown!.addEventListener("mouseenter", showDropdown);
+      dropdown!.addEventListener("mouseleave", hideDropdown);
+
+      button!.addEventListener("click", (e) => {
+        e.preventDefault();
+        const expanded = button!.getAttribute("aria-expanded") === "true";
+        if (expanded) {
+          hideDropdown();
+        } else {
+          showDropdown();
+        }
+      });
+
+      document.addEventListener("click", (e) => {
+        if (!dropdown!.contains(e.target as Node)) {
+          hideDropdown();
+        }
+      });
+    });
+  });
+</script>

@@ -9,28 +9,14 @@ export async function GET(context: APIContext): Promise<Response> {
     });
   }
 
-  const existingUser = (
-    await db
-      .select()
-      .from(User)
-      .where(
-        sql`${User.id} = ${context.locals.session ? context.locals.session.userId : ""}`,
-      )
-  )[0];
-
   const offset = context.params.offset ? context.params.offset : 0;
   const playlistId = context.params.playlist;
-
-  const session = await db
-    .select()
-    .from(Session)
-    .where(eq(existingUser.id, Session.userId));
 
   const spotifyTrackResponse = await fetch(
     `https://api.spotify.com/v1/playlists/${playlistId}/tracks?fields=name%2C+items%28added_by.id%2C+added_at%2C+track%28name%2C+popularity%2C+id%2C+duration_ms%2Cartists%28name%2Cid%29%2C+album%28name%2C+id%2Cimages%29%29&limit=100&offset=${offset}`,
     {
       headers: {
-        Authorization: `Bearer ${session[0].accessToken}`,
+        Authorization: `Bearer ${context.locals.accessToken}`,
       },
     },
   );
@@ -38,7 +24,7 @@ export async function GET(context: APIContext): Promise<Response> {
     `https://api.spotify.com/v1/playlists/${playlistId}?fields=name%2Cid%2Cowner%28id%2C+display_name%29`,
     {
       headers: {
-        Authorization: `Bearer ${session[0].accessToken}`,
+        Authorization: `Bearer ${context.locals.accessToken}`,
       },
     },
   );

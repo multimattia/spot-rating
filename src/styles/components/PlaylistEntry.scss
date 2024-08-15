@@ -7,12 +7,17 @@ a {
   overflow: hidden;
   padding: 20px;
   // background-color: var(--grass-4);
-  border: 3px solid var(--grass-4);
+  outline: 3px solid var(--blue-11);
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
   transition:
+    outline-offset 0.1s ease,
+    outline 0.1s ease,
     transform 0.2s ease,
-    background-color 0.2s ease;
+    margin 0.2s ease,
+    background-color 0.2s ease,
+    box-shadow 0.3s ease,
+    filter 0.3s ease;
   margin: var(--space-2xs) var(--space-l);
   padding: var(--space-m) var(--space-l);
   border-radius: var(--radius-xs);
@@ -23,7 +28,23 @@ a {
 }
 
 .playlist:hover {
-  background-color: var(--grass-3);
+  outline: 7px solid var(--blue-11);
+  outline-offset: -4px;
+  margin-right: -3rem;
+  // margin-left: calc(2 * var(--space-l));
+  // margin-right: calc(2 * var(--space-l));
+}
+
+.desc-inner {
+  display: inline-block;
+  // padding-left: 100%;
+  will-change: transform;
+}
+
+.playlist:hover .desc-inner {
+  overflow: visible;
+  animation: marquee 3s linear infinite;
+  animation-duration: calc(var(--marquee-duration) * 1s);
 }
 
 .playlist::after {
@@ -39,7 +60,7 @@ a {
   color: var(--grass-5);
   transform: translateX(0);
   transition:
-    transform 0.3s ease,
+    transform 0.4s ease,
     color 0.3s ease;
   z-index: 0;
 }
@@ -49,7 +70,7 @@ a {
 }
 
 .playlist:hover::after {
-  transform: translateX(-30%);
+  transform: translateX(-40%);
 }
 
 .playlist * {

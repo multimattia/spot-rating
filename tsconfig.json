@@ -1,6 +1,10 @@
 {
   "extends": "astro/tsconfigs/strict",
   "compilerOptions": {
+    "typeRoots": ["./node_modules/@types", "./src/types"],
+    "types": ["spotify-web-playback-sdk"],
+    // "esModuleInterop": true,
+    // "skipLibCheck": true,
     "baseUrl": ".",
     "paths": {
       "@assets/*": [
@@ -23,9 +27,12 @@
       ],
       "@images/*": [
         "src/assets/images/*"
-      ],
-    }
+      ]
+    },
+    "jsx": "react-jsx",
+    "jsxImportSource": "react",
   },
+  "typeAcquisition": {"enable": true},
   "exclude": [
     "node_modules",
     "dist"

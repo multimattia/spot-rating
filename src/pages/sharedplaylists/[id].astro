@@ -1,50 +1,40 @@
 ---
 const { id } = Astro.params;
-import { db, User, Session, Playlists, Songs_Temp, eq, sql } from "astro:db";
+import { db, sql } from "astro:db";
 import { Image } from "astro:assets";
 import LocalSong from "@components/LocalSong.astro";
 import BaseLayout from "@layouts/BaseLayout.astro";
 
 import type { Song } from "@components/LocalSong.astro";
 
-const luciaUser = Astro.locals.user;
-if (!luciaUser) {
-  return Astro.redirect("/login");
+let playlistInfo;
+try {
+  playlistInfo = await fetch(
+    `https://api.spotify.com/v1/playlists/${id}?fields=name%2C,description%2Cowner%28display_name%29%2C+images%28url%29`,
+    {
+      headers: {
+        Authorization: `Bearer ${Astro.locals.accessToken}`,
+      },
+    }
+  );
+} catch (e) {
+  return Astro.redirect("/api/logout");
 }
 
-const existingUser = (
-  await db
-    .select()
-    .from(User)
-    .where(sql`${User.id} = ${luciaUser.id}`)
-)[0];
-
-const session = await db
-  .select()
-  .from(Session)
-  .where(eq(existingUser.id, Session.userId));
-
-const playlistInfo = await fetch(
-  `https://api.spotify.com/v1/playlists/${id}?fields=name%2C,description%2Cowner%28display_name%29%2C+images%28url%29`,
-  {
-    headers: {
-      Authorization: `Bearer ${session[0].accessToken}`,
-    },
-  }
-);
-
 const playlistData = await playlistInfo.json();
-console.log(JSON.stringify(playlistData, null, 2));
 
-const savedSongs = await db
-  .select()
-  .from(Songs_Temp)
-  .where(sql`${id} = ${Songs_Temp.playlistId}`);
+// const savedSongs = await db
+//   .select()
+//   .from(Songs_Temp)
+//   .where(sql`${id} = ${Songs_Temp.playlistId}`);
 
 console.log(JSON.stringify(playlistData, null, 2));
 ---
 
-<BaseLayout title={`Playlist: ${"asd"}`} existingUser={existingUser}>
+<BaseLayout
+  title={`Playlist: ${"asd"}`}
+  existingUser={Astro.locals.currentUser}
+>
   <div class="playlist-header">
     <Image src={playlistData.images[0].url} alt="" width="200" height="200" />
     <div class="playlist-info">
@@ -55,7 +45,7 @@ console.log(JSON.stringify(playlistData, null, 2));
       <h5>{playlistData.description}</h5>
     </div>
   </div>
-  {savedSongs.map((item: Song) => <LocalSong songInfo={item} />)}
+  <!-- {savedSongs.map((item: Song) => <LocalSong songInfo={item} />)} -->
 </BaseLayout>
 
 <style>

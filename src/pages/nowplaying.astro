@@ -1,0 +1,21 @@
+---
+import BaseLayout from "@layouts/BaseLayout.astro";
+import { db, User, Playlists, Songs, eq, sql, desc } from "astro:db";
+import { SpotifyPlayer } from "@components/react/SpotifyPlayer";
+const accessToken = Astro.locals.accessToken;
+---
+
+<BaseLayout
+  isSignedIn={Astro.locals.currentUser ? true : false}
+  title=`Boomboxd`
+  existingUser={Astro.locals.currentUser}
+>
+  <h1>Now Playing:</h1>
+  <!-- <SpotifyPlayer client:only="react" token={accessToken} /> -->
+</BaseLayout>
+
+<style lang="scss">
+  h1 {
+    margin: var(--space-xl) 0;
+  }
+</style>
